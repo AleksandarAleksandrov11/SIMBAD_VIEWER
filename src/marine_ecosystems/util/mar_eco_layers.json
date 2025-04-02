@@ -1,0 +1,102 @@
+{
+    "Andalucia": {
+        "mapas_binarios": [
+            {
+                "layer": "simbad:Andalucia_Binary_Map",
+                "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Ibiza_Raw&bbox=1.1762,38.8225,1.6727,39.1360&width=768&height=484&srs=EPSG:4326&format=image/geotiff"
+            }
+        ],
+        "mapas_comparativos": [
+            {
+                "layer": "simbad:Andalucia_Comparative_Map",
+                "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Ibiza_Raw&bbox=1.1762,38.8225,1.6727,39.1360&width=768&height=484&srs=EPSG:4326&format=image/geotiff"
+            }
+        ],
+        "probabilidades": [
+            {
+                "layer": "simbad:Andalucia_Probabilities",
+                "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Ibiza_Raw&bbox=1.1762,38.8225,1.6727,39.1360&width=768&height=484&srs=EPSG:4326&format=image/geotiff"
+            }
+        ]
+    },
+    "Cataluna": {
+        "mapas_binarios": [
+            {
+                "layer": "simbad:Cataluna_Binary_Map",
+                "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Ibiza_Raw&bbox=1.1762,38.8225,1.6727,39.1360&width=768&height=484&srs=EPSG:4326&format=image/geotiff"
+            }
+        ],
+        "mapas_comparativos": [
+            {
+                "layer": "simbad:Cataluna_Comparative_Map",
+                "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Ibiza_Raw&bbox=1.1762,38.8225,1.6727,39.1360&width=768&height=484&srs=EPSG:4326&format=image/geotiff"
+            }
+        ],
+        "probabilidades": [
+            {
+                "layer": "simbad:Cataluna_Probabilities",
+                "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Ibiza_Raw&bbox=1.1762,38.8225,1.6727,39.1360&width=768&height=484&srs=EPSG:4326&format=image/geotiff"
+            }
+        ]
+    },
+    "Islas Baleares": {
+        "mapas_binarios": [
+            {
+                "layer": "simbad:Islas_Baleares_Binary_Map",
+                "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Ibiza_Raw&bbox=1.1762,38.8225,1.6727,39.1360&width=768&height=484&srs=EPSG:4326&format=image/geotiff"
+            }
+        ],
+        "mapas_comparativos": [
+            {
+                "layer": "simbad:Islas_Baleares_Comparative_Map",
+                "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Ibiza_Raw&bbox=1.1762,38.8225,1.6727,39.1360&width=768&height=484&srs=EPSG:4326&format=image/geotiff"
+            }
+        ],
+        "probabilidades": [
+            {
+                "layer": "simbad:Islas_Baleares_Probabilities",
+                "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Ibiza_Raw&bbox=1.1762,38.8225,1.6727,39.1360&width=768&height=484&srs=EPSG:4326&format=image/geotiff"
+            }
+        ]
+    },
+    "Murcia": {
+        "mapas_binarios": [
+            {
+                "layer": "simbad:Murcia_Binary_Map",
+                "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Ibiza_Raw&bbox=1.1762,38.8225,1.6727,39.1360&width=768&height=484&srs=EPSG:4326&format=image/geotiff"
+            }
+        ],
+        "mapas_comparativos": [
+            {
+                "layer": "simbad:Murcia_Comparative_Map",
+                "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Ibiza_Raw&bbox=1.1762,38.8225,1.6727,39.1360&width=768&height=484&srs=EPSG:4326&format=image/geotiff"
+            }
+        ],
+        "probabilidades": [
+            {
+                "layer": "simbad:Murcia_Probabilities",
+                "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Ibiza_Raw&bbox=1.1762,38.8225,1.6727,39.1360&width=768&height=484&srs=EPSG:4326&format=image/geotiff"
+            }
+        ]
+    },
+    "Valencia": {
+        "mapas_binarios": [
+            {
+                "layer": "simbad:Valencia_Binary_Map",
+                "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Ibiza_Raw&bbox=1.1762,38.8225,1.6727,39.1360&width=768&height=484&srs=EPSG:4326&format=image/geotiff"
+            }
+        ],
+        "mapas_comparativos": [
+            {
+                "layer": "simbad:Valencia_Comparative_Map",
+                "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Ibiza_Raw&bbox=1.1762,38.8225,1.6727,39.1360&width=768&height=484&srs=EPSG:4326&format=image/geotiff"
+            }
+        ],
+        "probabilidades": [
+            {
+                "layer": "simbad:Valencia_Probabilities",
+                "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Ibiza_Raw&bbox=1.1762,38.8225,1.6727,39.1360&width=768&height=484&srs=EPSG:4326&format=image/geotiff"
+            }
+        ]
+    }
+}

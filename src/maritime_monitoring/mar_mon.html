@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Maritime Monitoring</title>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""/>
+    <link rel="stylesheet" href="../maritime_monitoring/css/mar_mon.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""></script>
+  </head>
+
+  <body>
+    <div id="app"></div>
+
+    <a href="../main/index.html">
+      <img src="../main/main_images/logo-simbad-color.png" class="simbad_logo" alt="SIMBAD LOGO" />
+    </a>
+
+    <script>
+      // Reads the layers.json file and creates a map
+      fetch('../maritime_monitoring/util/mar_mon_layers.json')
+        .then(response => response.json())
+        .then(data => {
+          const map = leaflet.map("app").setView([39.19, 2.52], 6);
+
+          // Set the map to Spain and Portugal
+          const baseLayer = leaflet.tileLayer(
+            "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+            {
+              format: "text/html",
+              subdomains: "abcd",
+              maxZoom: 19,
+              noWrap: true
+            }).addTo(map);
+
+          // List of layers for Spain and Portugal
+          const spainLayers = {};
+          const portugalLayers = {};
+
+          function addLayerWithWatermark(layerUrl, layerOptions, bbox) {
+            const layer = leaflet.tileLayer.wms(layerUrl, layerOptions);
+            // Create a watermark image overlay
+            const watermark = leaflet.imageOverlay(
+              '../main/main_images/simbad_watermark.png',
+              [
+                [bbox[1], bbox[0]],
+                [bbox[3], bbox[2]]
+              ],
+              { opacity: 0.15 }
+            );
+            // Create a layer group to hold both the layer and the watermark
+            const group = leaflet.layerGroup([layer, watermark]);
+            return group;
+          }
+
+          // Add layers for Spain and Portugal with watermarks using the bbox from the URL of each layer
+          data.spain.forEach(layer => {
+            const bbox = layer.url.match(/bbox=([^&]+)/)[1].split(',').map(Number);
+            const tileLayer = addLayerWithWatermark("https://pcfs.quasarsr.com/geoserver/wms?", {
+              layers: layer.layer,
+              format: "image/png",
+              transparent: "true",
+              version: "1.3.0",
+              maxZoom: 19,
+            }, bbox);
+            spainLayers[layer.layer] = tileLayer;
+          });
+          
+          data.portugal.forEach(layer => {
+            const bbox = layer.url.match(/bbox=([^&]+)/)[1].split(',').map(Number);
+            const tileLayer = addLayerWithWatermark("https://pcfs.quasarsr.com/geoserver/wms?", {
+              layers: layer.layer,
+              format: "image/png",
+              transparent: "true",
+              version: "1.3.0",
+              maxZoom: 19,
+            }, bbox);
+            portugalLayers[layer.layer] = tileLayer;
+          });
+
+          // Create a custom menu for the layers
+          const menu = leaflet.DomUtil.create('div', 'menu');
+
+          // Group the layers by city
+          function groupLayersByCity(layers) {
+            const grouped = {};
+            layers.forEach(layer => {
+              const city = layer.layer.split(':')[1].split('_')[0];
+              // Check if the city already exists in the grouped object
+              if (!grouped[city]) {
+                grouped[city] = [];
+              }
+              grouped[city].push(layer);
+            });
+            return grouped;
+          }
+
+          // The menu contains a button for each country, a button for each city and a checkbox for each layer
+          menu.innerHTML = `
+            <button class="country">Spain</button>
+            <div class="cities" id="spain-cities" style="display: none;">
+              ${Object.keys(groupLayersByCity(data.spain)).map(city => `
+                <button class="city">${city}</button>
+                <div class="city-layers" id="spain-${city}-layers" style="display: none;">
+                  ${groupLayersByCity(data.spain)[city].map(layer => `
+                    <div>
+                      <input type="checkbox" id="spain-${city}-${layer.layer}" data-country="spain" data-city="${city}" data-layer="${layer.layer}">
+                      <label for="spain-${city}-${layer.layer}">${layer.layer.split('_')[1]}</label>
+                    </div>
+                  `).join('')}
+                </div>
+              `).join('')}
+            </div>
+
+            <button class="country">Portugal</button>
+            <div class="cities" id="portugal-cities" style="display: none;">
+              ${Object.keys(groupLayersByCity(data.portugal)).map(city => `
+                <button class="city">${city}</button>
+                <div class="city-layers" id="portugal-${city}-layers" style="display: none;">
+                  ${groupLayersByCity(data.portugal)[city].map(layer => `
+                    <div>
+                      <input type="checkbox" id="portugal-${city}-${layer.layer}" data-country="portugal" data-city="${city}" data-layer="${layer.layer}">
+                      <label for="portugal-${city}-${layer.layer}">${layer.layer.split('_')[1]}</label>
+                    </div>
+                  `).join('')}
+                </div>
+              `).join('')}
+            </div>
+          `;
+
+          // Append the custom menu to the map
+          document.body.appendChild(menu);
+
+          // Depending on the checkbox, add or remove the layer from the map
+          function toggleLayer(event) {
+            const country = event.target.getAttribute('data-country');
+            const layerName = event.target.getAttribute('data-layer');
+
+            let layer;
+            if (country === 'spain') {
+              layer = spainLayers[layerName];
+            } else if (country === 'portugal') {
+              layer = portugalLayers[layerName];
+            }
+
+            if (event.target.checked) {
+              layer.addTo(map);
+            } else {
+              map.removeLayer(layer);
+            }
+          }
+
+          // Changes the layer when the checkbox is checked or unchecked
+          document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', toggleLayer);
+          });
+
+          // Shows or hides the list of cities when the country is clicked
+          function toggleCities(event) {
+            const cityDiv = event.target.nextElementSibling;
+            if (cityDiv.style.display === "block") {
+              cityDiv.style.display = "none";
+            } else {
+              cityDiv.style.display = "block";
+            }
+          }
+
+          // For each country if it is clicked, it shows the cities
+          document.querySelectorAll(".country").forEach(countryButton => {
+            countryButton.addEventListener("click", toggleCities);
+          });
+
+          // Shows or hides the list of layers when the city is clicked
+          function toggleCityLayers(event) {
+            const cityLayersDiv = event.target.nextElementSibling;
+            if (cityLayersDiv.style.display === "block") {
+              cityLayersDiv.style.display = "none";
+            } else {
+              cityLayersDiv.style.display = "block";
+            }
+          }
+
+          // For each city if it is clicked, it shows the layers
+          document.querySelectorAll(".city").forEach(cityButton => {
+            cityButton.addEventListener("click", toggleCityLayers);
+          });
+
+          // Create a button to download the selected layers
+          const DownloadButton = leaflet.Control.extend({
+            onAdd: function(map) {
+              const button = leaflet.DomUtil.create('button', 'leaflet-control-download');
+              button.innerHTML = 'Download selected layers';
+              button.addEventListener('click', function() {
+
+                // Get the selected layers from each country
+                const selectedLayers = [];
+                Object.values(spainLayers).forEach(layer => {
+                  if (map.hasLayer(layer)) {
+                    selectedLayers.push(layer.options.layers);
+                  }
+                });
+                Object.values(portugalLayers).forEach(layer => {
+                  if (map.hasLayer(layer)) {
+                    selectedLayers.push(layer.options.layers);
+                  }
+                });
+
+                // Open a new tab for each selected layer
+                selectedLayers.forEach(layer => {
+                  const matchingLayer = [...data.spain, ...data.portugal].find(l => l.layer === layer);
+                  if (matchingLayer) {
+                    // If working on FireFox deselect the option 'Block pop-up windows'
+                    window.open(matchingLayer.url, "_blank");
+                  }
+                });
+                
+              });
+              return button;
+            }
+          });
+
+          // Add the download button to the map at the bottom right corner
+          const downloadButton = new DownloadButton({ position: 'bottomright' });
+          downloadButton.addTo(map);
+
+        });
+
+    </script>
+  </body>
+</html>

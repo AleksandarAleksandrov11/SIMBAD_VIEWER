@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Maritime Monitoring</title>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""/>
+    <link rel="stylesheet" href="../marine_ecosystems/css/mar_eco.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""></script>
+  </head>
+
+  <body>
+    <div id="app"></div>
+
+    <a href="../main/index.html">
+      <img src="../main/main_images/logo-simbad-color.png" class="simbad_logo" alt="SIMBAD LOGO" />
+    </a>
+
+    <script>
+        // Reads the layers.json file and creates a map
+        fetch('../marine_ecosystems/util/mar_eco_layers.json')
+          .then(response => response.json())
+          .then(data => {
+            console.log(data);
+            const map = leaflet.map("app").setView([39.19, 2.52], 6);
+    
+            // Set the base layer
+            const baseLayer = leaflet.tileLayer(
+              "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+              {
+                format: "text/html",
+                subdomains: "abcd",
+                maxZoom: 19,
+                noWrap: true
+              }
+            ).addTo(map);
+    
+            // Object to store all layers
+            const allLayers = {};
+    
+            // Function to add a layer with a watermark
+            function addLayerWithWatermark(layerUrl, layerOptions, bbox) {
+              const layer = leaflet.tileLayer.wms(layerUrl, layerOptions);
+              const watermark = leaflet.imageOverlay(
+                '../main/main_images/simbad_watermark.png',
+
+                [
+                  [bbox[1], bbox[0]],
+                  [bbox[3], bbox[2]]
+                ],
+                { opacity: 0.15 }
+              );
+              const group = leaflet.layerGroup([layer, watermark]);
+              return group;
+            }
+            
+    
+            // Iterate over regions, categories, and layers
+            Object.keys(data).forEach(region => {
+              Object.keys(data[region]).forEach(category => {
+                data[region][category].forEach(layer => {
+                  const bbox = layer.url.match(/bbox=([^&]+)/)[1].split(',').map(Number);
+                  const layerGroup = addLayerWithWatermark(layer.url, {
+                    layers: layer.layer,
+                    format: "image/png",
+                    transparent: "true",
+                    version : "1.3.0",
+                    maxZoom: 19,
+                  }, bbox);
+    
+                  if (!allLayers[region]) {
+                    allLayers[region] = {};
+                  }
+                  if (!allLayers[region][category]) {
+                    allLayers[region][category] = {};
+                  }
+                  allLayers[region][category][layer.layer] = layerGroup;
+                  console.log(allLayers[region][category][layer.layer]);
+                });
+              });
+            });
+    
+            // Create the menu based on the JSON
+            const menu = leaflet.DomUtil.create('div', 'menu');
+            menu.innerHTML = `
+              ${Object.keys(data).map(region => `
+                <button class="region">${region}</button>
+                <div class="categories" id="${region}-categories" style="display: none;">
+                  ${Object.keys(data[region]).map(category => `
+                    <button class="category">${category}</button>
+                    <div class="layers" id="${region}-${category}-layers" style="display: none;">
+                      ${data[region][category].map(layer => `
+                        <div>
+                          <input type="checkbox" id="${region}-${category}-${layer.layer}" data-region="${region}" data-category="${category}" data-layer="${layer.layer}">
+                          <label for="${region}-${category}-${layer.layer}">${layer.layer.split(':')[1]}</label>
+                        </div>
+                      `).join('')}
+                    </div>
+                  `).join('')}
+                </div>
+              `).join('')}
+            `;
+            document.body.appendChild(menu);
+    
+            // Toggle layers on checkbox change
+            function toggleLayer(event) {
+              const region = event.target.getAttribute('data-region');
+              const category = event.target.getAttribute('data-category');
+              const layerName = event.target.getAttribute('data-layer');
+              const layerGroup = allLayers[region][category][layerName];
+              if (event.target.checked) {
+                layerGroup.addTo(map);
+              } else {
+                map.removeLayer(layerGroup);
+              }
+            }
+    
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+              checkbox.addEventListener('change', toggleLayer);
+            });
+    
+            // Show/hide categories when clicking on a region
+            document.querySelectorAll(".region").forEach(regionButton => {
+              regionButton.addEventListener("click", event => {
+                const categoriesDiv = event.target.nextElementSibling;
+                if (categoriesDiv.style.display === "block") {
+                  categoriesDiv.style.display = "none";
+              } else {
+                  categoriesDiv.style.display = "block";
+              }
+              });
+            });
+    
+            // Show/hide layers when clicking on a category
+            document.querySelectorAll(".category").forEach(categoryButton => {
+              categoryButton.addEventListener("click", event => {
+                const layersDiv = event.target.nextElementSibling;
+                if (layersDiv.style.display === "block") {
+                  layersDiv.style.display = "none";
+                  } else {
+                      layersDiv.style.display = "block";
+              }
+              });
+            });
+    
+              // Create a button to download the selected layers
+              const DownloadButton = leaflet.Control.extend({
+              onAdd: function(map) {
+                  const button = leaflet.DomUtil.create('button', 'leaflet-control-download');
+                  button.innerHTML = 'Download selected layers';
+                  button.addEventListener('click', function() {
+                  const selectedLayers = [];
+    
+                  // Iterate over all regions and categories to find active layers
+                  Object.keys(allLayers).forEach(region => {
+                      Object.keys(allLayers[region]).forEach(category => {
+                      Object.keys(allLayers[region][category]).forEach(layerName => {
+                          const layerGroup = allLayers[region][category][layerName];
+                          if (map.hasLayer(layerGroup)) {
+                          selectedLayers.push(layerName);
+                          }
+                      });
+                      });
+                  });
+    
+                  // Open a new tab for each selected layer
+                  selectedLayers.forEach(layerName => {
+                      const matchingLayer = Object.values(data).flatMap(region =>
+                      Object.values(region).flatMap(category => category)
+                      ).find(layer => layer.layer === layerName);
+    
+                      if (matchingLayer) {
+                      window.open(matchingLayer.url, "_blank");
+                      }
+                  });
+                  });
+                  return button;
+              }
+            });
+    
+            // Add the download button to the map at the bottom right corner
+            const downloadButton = new DownloadButton({ position: 'bottomright' });
+            downloadButton.addTo(map);
+    
+          })
+      </script>
+  </body>
+</html>

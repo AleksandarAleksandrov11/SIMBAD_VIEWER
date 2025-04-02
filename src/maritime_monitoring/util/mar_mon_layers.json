@@ -1,0 +1,50 @@
+{
+    "spain": [
+        {
+            "layer": "simbad:Formentera_Bathymetry",
+            "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Formentera_Bathymetry&bbox=1.3238,38.5731,1.6022,38.8173&width=768&height=673&srs=EPSG:4326&format=image/geotiff"
+        },
+        {
+            "layer": "simbad:Formentera_Raw_Image",
+            "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Formentera_Raw_Image&bbox=1.3238,38.5731,1.6023,38.8173&width=768&height=673&srs=EPSG:4326&format=image/geotiff"
+        },
+        {
+            "layer": "simbad:Formentera_Traganos",
+            "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Formentera_Traganos&bbox=1.3238,38.5731,1.6023,38.8173&width=768&height=673&srs=EPSG:4326&format=image/geotiff"
+        },
+        {
+            "layer": "simbad:Formentera_Vector_Mask",
+            "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Formentera_Vector_Mask&bbox=1.3238,38.5731,1.6023,38.8173&width=768&height=673&srs=EPSG:4326&format=image/geotiff"
+        },
+        {
+            "layer": "simbad:Ibiza_Level_Curves",
+            "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Ibiza_Level_Curves&bbox=1.1756,38.8133,1.6621,39.1303&width=768&height=500&srs=EPSG:4326&format=image/geotiff"
+        },
+        {
+            "layer": "simbad:Ibiza_Mask",
+            "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Ibiza_Mask&bbox=1.1762,38.8225,1.6727,39.1360&width=768&height=484&srs=EPSG:4326&format=image/geotiff"
+        },
+        {
+            "layer": "simbad:Ibiza_Raw",
+            "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Ibiza_Raw&bbox=1.1762,38.8225,1.6727,39.1360&width=768&height=484&srs=EPSG:4326&format=image/geotiff"
+        },
+        {
+            "layer": "simbad:Ibiza_Traganos",
+            "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Ibiza_Traganos&bbox=1.1762,38.8225,1.6727,39.1360&width=768&height=484&srs=EPSG:4326&format=image/geotiff"
+        },
+        {
+            "layer": "simbad:Menorca_Vector_Mask",
+            "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Menorca_Vector_Mask&bbox=3.7903,39.8012,4.2818,40.0948&width=768&height=458&srs=EPSG:4326&format=image/geotiff"
+        }
+    ],
+    "portugal": [
+        {
+            "layer": "simbad:Portugal_Layer_1",
+            "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Portugal_Layer_1&bbox=-9.5,36.0,-6.0,42.0&width=768&height=484&srs=EPSG:4326&format=image/geotiff"
+        },
+        {
+            "layer": "simbad:Portugal_Layer_2",
+            "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Portugal_Layer_2&bbox=-9.5,36.0,-6.0,42.0&width=768&height=484&srs=EPSG:4326&format=image/geotiff"
+        }
+    ]
+}
