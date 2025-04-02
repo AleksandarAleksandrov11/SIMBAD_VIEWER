@@ -1,0 +1,92 @@
+body {
+    padding: 0;
+    margin: 0;
+}
+html, body, #app {
+    height: 100%;
+    width: 100%;
+}
+#main_container {
+    background-image: url('../main_images/main_head_background.gif');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    height: 968px;
+}
+.main_title{
+    font-family: "Sora", sans-serif;
+    font-size: 100px;
+    z-index: 7;
+    color: #FFFFFF;
+    margin-left: 7%;
+    margin-top: 15%;
+    font-weight: bold;
+}
+.simbad_logo{
+    left: 4%;
+    bottom: -30px;
+    width: 155px;
+    height: 50px;
+    position: relative;
+}
+.product{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 175px;
+    height: auto;
+    margin: 2%;
+}
+.product_image{
+    width: 100%;
+    height: auto;
+}
+.product_image:hover{
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
+}
+.products_title{
+    font-family: "Sora", sans-serif;
+    font-size: 40px;
+    font-weight: 550;
+    color: #FFFFFF;
+    position: relative;
+    text-align: center;
+    margin: 130px 0 20px 0;
+    padding: 0;
+    z-index: 1;
+}
+.products_row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 20px;
+    width: 100%;
+}
+.product_title{
+    font-family: "Sora", sans-serif;
+    font-size: 15px;
+    color: #FFFFFF;
+    position: relative;
+    text-align: center;
+    margin: 0 0 20px 0;
+    padding: 0;
+    z-index: 1;
+    text-decoration: none;
+    min-height: 40px;
+}
+a{
+    text-decoration: none;
+}
+.quasarsr_logo {
+    width: 130px;
+    height: auto;
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    z-index: 10;
+}
