@@ -24,7 +24,6 @@
         fetch('../marine_ecosystems/util/mar_eco_layers.json')
           .then(response => response.json())
           .then(data => {
-            console.log(data);
             const map = leaflet.map("app").setView([39.19, 2.52], 6);
     
             // Set the base layer
@@ -63,7 +62,7 @@
               Object.keys(data[region]).forEach(category => {
                 data[region][category].forEach(layer => {
                   const bbox = layer.url.match(/bbox=([^&]+)/)[1].split(',').map(Number);
-                  const layerGroup = addLayerWithWatermark(layer.url, {
+                  const layerGroup = addLayerWithWatermark("https://pcfs.quasarsr.com/geoserver/wms?", {
                     layers: layer.layer,
                     format: "image/png",
                     transparent: "true",
@@ -78,7 +77,6 @@
                     allLayers[region][category] = {};
                   }
                   allLayers[region][category][layer.layer] = layerGroup;
-                  console.log(allLayers[region][category][layer.layer]);
                 });
               });
             });
