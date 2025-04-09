@@ -9,7 +9,7 @@ html, body, #app {
 .simbad_logo {
     position: fixed;
     top: 10px;
-    left: 3%;
+    left: 5%;
     width: 100px;
     height: auto;
     z-index: 1000;
@@ -98,4 +98,16 @@ html, body, #app {
 }
 .leaflet-control-download:hover {
     background-color: #23527c;
+}
+.progress-bar{
+    width: 100%;
+    background: rgb(148, 145, 145);
+    height: 8px;
+    display: none;
+}
+.progress{
+    width: 0%;
+    background: rgb(25, 229, 25);
+    height: 100%;
+    margin-top: 4px;
 }

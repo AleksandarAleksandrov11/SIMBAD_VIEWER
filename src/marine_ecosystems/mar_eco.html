@@ -26,6 +26,7 @@
           .then(data => {
             const map = leaflet.map("app").setView([39.19, 2.52], 6);
     
+            console.log(data);
             // Set the base layer
             const baseLayer = leaflet.tileLayer(
               "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -96,19 +97,72 @@
                           <label for="${region}-${category}-${layer.layer}">${layer.layer.split(':')[1]}</label>
                         </div>
                       `).join('')}
+                        <div>
+                          <input type="checkbox" id="${region}-${category}-cycle" data-region="${region}" data-category="${category}">
+                          <label for="${region}-${category}-cycle">Show layers in order</label>
+                        </div>
+                        <div id="progress-bar-${region}-${category}" class="progress-bar">
+                          <div id="progress-${region}-${category}" class="progress"></div>
+                        </div>
                     </div>
                   `).join('')}
                 </div>
               `).join('')}
             `;
             document.body.appendChild(menu);
-    
+
+            // Shows all the layers of each category in order
+            function showAllLayersInOrder(event){
+
+              const region = event.target.getAttribute('data-region');
+              const category = event.target.getAttribute('data-category');
+              const layers = Object.keys(allLayers[region][category]);
+              const progress = document.getElementById(`progress-${region}-${category}`);
+              const progressBar = document.getElementById(`progress-bar-${region}-${category}`);
+              const label = document.querySelector(`label[for="${region}-${category}-cycle"]`);
+              let currentLayerIndex = 0;
+
+              function showNextLayer(){
+                // Remove the last layer if it exists
+                if(currentLayerIndex > 0){
+                  const lastLayer = layers[currentLayerIndex - 1];
+                  map.removeLayer(allLayers[region][category][lastLayer]);
+                }
+                // Shows the layers in order until the last one changing the label and the progress bar for each one
+                if(currentLayerIndex < layers.length){
+                  const currentLayer = layers[currentLayerIndex];
+                  label.innerHTML = `Showing ${currentLayer.split(':')[1]}`;
+                  map.addLayer(allLayers[region][category][currentLayer]);
+                  currentLayerIndex++;
+                  progress.style.width = `${(currentLayerIndex / layers.length) * 100}%`;
+                  progressBar.style.display = 'block';
+                  setTimeout(showNextLayer, 2500);
+                }else{
+                  label.innerHTML = `Show layers in order`;
+                  event.target.checked = false;
+                  progress.style.width = `0%`;
+                  progressBar.style.display = 'none';
+                }
+              }
+
+              if(event.target.checked){
+                showNextLayer();
+              }
+            }
+
+            // Gets all the checkboxes that end with -cycle and makes them show the layers in order when checked
+            document.querySelectorAll('input[id$="-cycle"]').forEach(checkbox => {
+              checkbox.addEventListener('change', showAllLayersInOrder);
+            });
+
+
             // Toggle layers on checkbox change
             function toggleLayer(event) {
               const region = event.target.getAttribute('data-region');
               const category = event.target.getAttribute('data-category');
               const layerName = event.target.getAttribute('data-layer');
               const layerGroup = allLayers[region][category][layerName];
+              
               if (event.target.checked) {
                 layerGroup.addTo(map);
               } else {
