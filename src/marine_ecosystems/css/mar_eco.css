@@ -103,7 +103,6 @@ html, body, #app {
     width: 100%;
     background: rgb(148, 145, 145);
     height: 8px;
-    display: none;
 }
 .progress{
     width: 0%;

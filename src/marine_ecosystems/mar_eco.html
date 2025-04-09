@@ -38,7 +38,7 @@
               }
             ).addTo(map);
     
-            // Object to store all layers
+            // Array to hold all layers
             const allLayers = {};
     
             // Function to add a layer with a watermark
@@ -58,7 +58,7 @@
             }
             
     
-            // Iterate over regions, categories, and layers
+            // Adds the layers in the allLayers array 
             Object.keys(data).forEach(region => {
               Object.keys(data[region]).forEach(category => {
                 data[region][category].forEach(layer => {
@@ -101,7 +101,7 @@
                           <input type="checkbox" id="${region}-${category}-cycle" data-region="${region}" data-category="${category}">
                           <label for="${region}-${category}-cycle">Show layers in order</label>
                         </div>
-                        <div id="progress-bar-${region}-${category}" class="progress-bar">
+                        <div id="progress-bar-${region}-${category}" class="progress-bar" style="display: none;">
                           <div id="progress-${region}-${category}" class="progress"></div>
                         </div>
                     </div>
@@ -128,6 +128,7 @@
                   const lastLayer = layers[currentLayerIndex - 1];
                   map.removeLayer(allLayers[region][category][lastLayer]);
                 }
+
                 // Shows the layers in order until the last one changing the label and the progress bar for each one
                 if(currentLayerIndex < layers.length){
                   const currentLayer = layers[currentLayerIndex];
