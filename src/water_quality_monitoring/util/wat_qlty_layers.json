@@ -1,0 +1,110 @@
+{
+    "Andalusia": {
+        "Binary Maps": [
+            {
+              "layer": "simbad:Formentera_Bathymetry",
+              "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Formentera_Bathymetry&bbox=1.3238,38.5731,1.6022,38.8173&width=768&height=673&srs=EPSG:4326&format=image/geotiff"
+            },  
+            {
+              "layer": "simbad:Formentera_Raw_Image",
+              "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Formentera_Raw_Image&bbox=1.3238,38.5731,1.6023,38.8173&width=768&height=673&srs=EPSG:4326&format=image/geotiff"
+            },
+            {
+              "layer": "simbad:Formentera_Traganos",
+              "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Formentera_Traganos&bbox=1.3238,38.5731,1.6023,38.8173&width=768&height=673&srs=EPSG:4326&format=image/geotiff"
+            }
+          ],
+          "Comparative Maps": [
+            {
+              "layer": "simbad:Formentera_Bathymetry",
+              "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Formentera_Bathymetry&bbox=1.3238,38.5731,1.6022,38.8173&width=768&height=673&srs=EPSG:4326&format=image/geotiff"
+            }
+          ],
+          "Probabilities": [
+            {
+              "layer": "simbad:Formentera_Bathymetry",
+              "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Formentera_Bathymetry&bbox=1.3238,38.5731,1.6022,38.8173&width=768&height=673&srs=EPSG:4326&format=image/geotiff"
+            }
+          ]
+    },
+    "Catalonia": {
+        "Binary Maps": [
+            {
+              "layer": "simbad:Formentera_Bathymetry",
+              "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Formentera_Bathymetry&bbox=1.3238,38.5731,1.6022,38.8173&width=768&height=673&srs=EPSG:4326&format=image/geotiff"
+            }
+          ],
+          "Comparative Maps": [
+            {
+              "layer": "simbad:Formentera_Bathymetry",
+              "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Formentera_Bathymetry&bbox=1.3238,38.5731,1.6022,38.8173&width=768&height=673&srs=EPSG:4326&format=image/geotiff"
+            }
+          ],
+          "Probabilities": [
+            {
+              "layer": "simbad:Formentera_Bathymetry",
+              "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Formentera_Bathymetry&bbox=1.3238,38.5731,1.6022,38.8173&width=768&height=673&srs=EPSG:4326&format=image/geotiff"
+            }
+          ]
+    },
+    "Balearic Islands": {
+        "Binary Maps": [
+            {
+              "layer": "simbad:Formentera_Bathymetry",
+              "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Formentera_Bathymetry&bbox=1.3238,38.5731,1.6022,38.8173&width=768&height=673&srs=EPSG:4326&format=image/geotiff"
+            }
+          ],
+          "Comparative Maps": [
+            {
+              "layer": "simbad:Formentera_Bathymetry",
+              "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Formentera_Bathymetry&bbox=1.3238,38.5731,1.6022,38.8173&width=768&height=673&srs=EPSG:4326&format=image/geotiff"
+            }
+          ],
+          "Probabilities": [
+            {
+              "layer": "simbad:Formentera_Bathymetry",
+              "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Formentera_Bathymetry&bbox=1.3238,38.5731,1.6022,38.8173&width=768&height=673&srs=EPSG:4326&format=image/geotiff"
+            }
+          ]
+    },
+    "Murcia": {
+        "Binary Maps": [
+            {
+              "layer": "simbad:Formentera_Bathymetry",
+              "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Formentera_Bathymetry&bbox=1.3238,38.5731,1.6022,38.8173&width=768&height=673&srs=EPSG:4326&format=image/geotiff"
+            }
+          ],
+          "Comparative Maps": [
+            {
+              "layer": "simbad:Formentera_Bathymetry",
+              "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Formentera_Bathymetry&bbox=1.3238,38.5731,1.6022,38.8173&width=768&height=673&srs=EPSG:4326&format=image/geotiff"
+            }
+          ],
+          "Probabilities": [
+            {
+              "layer": "simbad:Formentera_Bathymetry",
+              "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Formentera_Bathymetry&bbox=1.3238,38.5731,1.6022,38.8173&width=768&height=673&srs=EPSG:4326&format=image/geotiff"
+            }
+          ]
+    },
+    "Valencia": {
+        "Binary Maps": [
+            {
+              "layer": "simbad:Formentera_Bathymetry",
+              "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Formentera_Bathymetry&bbox=1.3238,38.5731,1.6022,38.8173&width=768&height=673&srs=EPSG:4326&format=image/geotiff"
+            }
+          ],
+          "Comparative Maps": [
+            {
+              "layer": "simbad:Formentera_Bathymetry",
+              "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Formentera_Bathymetry&bbox=1.3238,38.5731,1.6022,38.8173&width=768&height=673&srs=EPSG:4326&format=image/geotiff"
+            }
+          ],
+          "Probabilities": [
+            {
+              "layer": "simbad:Formentera_Bathymetry",
+              "url": "https://pcfs.quasarsr.com/geoserver/simbad/wms?service=WMS&version=1.1.0&request=GetMap&layers=simbad:Formentera_Bathymetry&bbox=1.3238,38.5731,1.6022,38.8173&width=768&height=673&srs=EPSG:4326&format=image/geotiff"
+            }
+          ]
+    }
+  }

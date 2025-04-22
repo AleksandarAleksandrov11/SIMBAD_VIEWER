@@ -1,0 +1,112 @@
+body {
+    padding: 0;
+    margin: 0;
+}
+html, body, #app {
+    height: 100%;
+    width: 100%;
+}
+.simbad_logo {
+    position: fixed;
+    top: 10px;
+    left: 5%;
+    width: 100px;
+    height: auto;
+    z-index: 1000;
+}
+.menu {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgb(19, 177, 164);
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 1000;
+    max-width: 450px;
+    overflow-y: auto;
+    max-height: 80vh;
+}
+.menu .region {
+    display: block;
+    width: 100%;
+    padding: 8px;
+    border-radius: 4px;
+    text-align: left;
+    margin-bottom: 5px;
+    background-color: #fff;
+    color: #333;
+    font-weight: bold;
+    font-size: 14px;
+    text-align: center;
+    cursor: pointer;
+}
+.menu .region:hover {
+    background-color: #c4c1c1;
+}
+.categories {
+    padding: 10px;
+    display: none;
+    overflow: hidden;
+    background-color: #84e0d1;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.menu .category {
+    display: block;
+    width: 100%;
+    padding: 8px;
+    border-radius: 4px;
+    text-align: left;
+    margin-bottom: 5px;
+    background-color: #fff;
+    color: #00217c;
+    font-weight: bold;
+    font-size: 14px;
+    text-align: center;
+    cursor: pointer;
+}
+.menu .category:hover {
+    background-color: #c4c1c1;
+}
+.layers {
+    padding: 8px;
+    display: none;
+    overflow: hidden;
+    background-color: #c2f0e9;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+.layers div {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+.layers input[type="checkbox"] {
+    margin-right: 8px;
+}
+.leaflet-control-download {
+    font-size: 16px;
+    padding: 8px 16px;
+    background-color: #337ab7;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.leaflet-control-download:hover {
+    background-color: #23527c;
+}
+.progress-bar{
+    width: 100%;
+    background: rgb(148, 145, 145);
+    height: 8px;
+}
+.progress{
+    width: 0%;
+    background: rgb(25, 229, 25);
+    height: 100%;
+    margin-top: 4px;
+}
