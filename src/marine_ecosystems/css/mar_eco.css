@@ -6,6 +6,7 @@ html, body, #app {
     height: 100%;
     width: 100%;
 }
+
 .simbad_logo {
     position: fixed;
     top: 10px;
@@ -26,6 +27,33 @@ html, body, #app {
     overflow-y: auto;
     max-height: 80vh;
 }
+.menu .country {
+    display: block;
+    width: 100%;
+    padding: 8px;
+    border-radius: 4px;
+    text-align: left;
+    margin-bottom: 5px;
+    background-color: #ffffff;
+    font-weight: bold;
+    font-size: 15px;
+    text-align: center;
+    cursor: pointer;
+}
+.menu .country:hover {
+    background-color: #c4c4c1;
+}
+.menu .regions{
+    padding: 10px;
+    display: none;
+    overflow: hidden;
+    background-color: #288474;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
 .menu .region {
     display: block;
     width: 100%;
@@ -41,7 +69,7 @@ html, body, #app {
     cursor: pointer;
 }
 .menu .region:hover {
-    background-color: #c4c1c1;
+    background-color: #c4c4c1;
 }
 .categories {
     padding: 10px;
@@ -90,14 +118,14 @@ html, body, #app {
 .leaflet-control-download {
     font-size: 16px;
     padding: 8px 16px;
-    background-color: #337ab7;
-    color: #fff;
-    border: none;
+    background-color: rgb(19, 177, 164);
+    border: 2px solid #000000;
     border-radius: 4px;
     cursor: pointer;
+    font-weight: bold;
 }
 .leaflet-control-download:hover {
-    background-color: #23527c;
+    background-color: #4582b7;
 }
 .progress-bar{
     width: 100%;
@@ -109,4 +137,16 @@ html, body, #app {
     background: rgb(25, 229, 25);
     height: 100%;
     margin-top: 4px;
+}
+.distance-label-content {
+    background: white;
+    padding: 2px 5px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    font-size: 12px;
+    text-align: center;
+  }
+.save{
+    margin-top: 5px;
 }
