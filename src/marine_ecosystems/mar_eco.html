@@ -11,8 +11,11 @@
       integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
       crossorigin="">
     </script>
-    <script src="../main/libs/leaflet-side-by-side.js"></script>
-    <script src="../main/libs/leaflet-side-by-side.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.geometryutil/0.10.0/leaflet.geometryutil.min.js"></script>
+    <link rel="stylesheet" href="../main/libs/Control.MiniMap.css" />
+    <script src="../main/libs/Control.MiniMap.js"></script>
   </head>
 
   <body>
@@ -56,6 +59,20 @@
 
             // The default base layer is the dark mode
             baseLayers["Dark Mode"].addTo(map);
+            const miniMapLayer = L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+              format: "text/html",
+              subdomains: "abcd",
+              maxZoom: 19,
+              noWrap: true,
+              zIndex: 1,
+            });
+
+            // Crear el minimapa
+            const miniMap = new L.Control.MiniMap(miniMapLayer, {
+              toggleDisplay: true,
+              minimized: false,
+              position: "bottomleft",
+            }).addTo(map);
 
             // Button that changes the base layer
             const BaseChanger = L.Control.extend({
@@ -81,54 +98,153 @@
             const baseChangeButton = new BaseChanger({ position: 'bottomright' });
             baseChangeButton.addTo(map);
 
-            // Adds a distance measuring tool to the map
-            let pointA, pointB, polyline, markerA = null, markerB = null, distanceLabel = null;
-            map.on("click", (e) => {
-
-              // If both points exist, remove the markers and polyline
-              if (pointA && pointB) {
-                map.removeLayer(polyline);
-                map.removeLayer(markerA);
-                map.removeLayer(markerB);
-                if (distanceLabel) {
-                  map.removeLayer(distanceLabel);
-                }
-                pointA = null;
-                pointB = null;
-              // If the first point does not exist, set it and add a marker
-              } else if (!pointA) {
-                pointA = e.latlng;
-                markerA = L.marker(pointA).addTo(map);
-              // If the second point does not exist, set it and add a marker and polyline
-              } else {
-                pointB = e.latlng;
-                markerB = L.marker(pointB).addTo(map);
-                polyline = L.polyline([pointA, pointB], { color: "blue" }).addTo(map);
-
-                const lengthInKm = (map.distance(pointA, pointB) / 1000).toFixed(2);
-                const midPoint = L.latLng(
-                  (pointA.lat + pointB.lat) / 2,
-                  (pointA.lng + pointB.lng) / 2
-                );
-
-                // Shows the distance in km in the middle of the line
-                distanceLabel = L.marker(midPoint, {
-                  icon: L.divIcon({
-                    html: `<div class="distance-label-content">${lengthInKm} km</div>`,
-                    iconSize: [50, 20]
-                  })
-                }).addTo(map);
-              }
-            });
-
             // Disables click propagation on the buttons 
             const buttons = document.querySelectorAll('button, input, .menu');
             buttons.forEach(button => {
               L.DomEvent.disableClickPropagation(button);
             });
 
-            // Disables double click zoom on the map
-            map.doubleClickZoom.disable();
+            const drawnItems = new L.FeatureGroup();
+            map.addLayer(drawnItems);
+
+            // Add Leaflet Draw control to the map
+            const drawControl = new L.Control.Draw({
+              edit: {
+                featureGroup: drawnItems,
+                remove: true
+              },
+              draw: {
+                polyline: {
+                  metric: true,
+                  shapeOptions: {
+                    color: 'blue'
+                  },
+                  allowIntersection: false,
+                  repeatMode: false
+                },
+                polygon: {
+                  allowIntersection: false,
+                  showArea: true,
+                  metric: true,
+                  shapeOptions: {
+                    color: 'green'
+                  }
+                },
+                rectangle: {
+                  showArea: true,
+                  metric: true,
+                  shapeOptions: {
+                    color: 'orange'
+                  }
+                },
+                circle: {
+                  showRadius: true,
+                  metric: true,
+                  shapeOptions: {
+                    color: 'red'
+                  }
+                },
+                marker: true,
+                circlemarker: true
+              }
+            });
+            map.addControl(drawControl);
+
+            // Handle the creation of new layers
+            map.on(L.Draw.Event.CREATED, (e) => {
+              const layer = e.layer;
+              let label = '';
+              let labelPos = null;
+
+              if (e.layerType === 'polygon' || e.layerType === 'rectangle') {
+
+                const area = L.GeometryUtil.geodesicArea(layer.getLatLngs()[0]) / 1e6;
+                label = `${area.toFixed(2)} km²`;
+                labelPos = layer.getBounds().getCenter();
+
+              } else if (e.layerType === 'polyline') {
+
+                const latlngs = layer.getLatLngs();
+                let totalDistance = 0;
+
+                for (let i = 0; i < latlngs.length - 1; i++) {
+                  totalDistance += map.distance(latlngs[i], latlngs[i + 1]);
+                }
+
+                const totalDistanceInKm = (totalDistance / 1000).toFixed(2);
+                label = `${totalDistanceInKm} km`;
+
+                labelPos = layer.getBounds().getCenter();
+              } else if (e.layerType === 'circle') {
+
+                const radius = layer.getRadius();
+                label = `Radio: ${(radius / 1000).toFixed(2)} km`;
+                labelPos = layer.getLatLng();
+
+              } else if (e.layerType === 'marker' || e.layerType === 'circlemarker') {
+
+                labelPos = layer.getLatLng();
+              }
+
+              layer.addTo(map);
+              drawnItems.addLayer(layer);
+
+              if (label && labelPos) {
+                layer.bindTooltip(label, {
+                  permanent: true,
+                  direction: 'center',
+                  className: 'distance-label-content',
+                  offset: [0, 0]
+                }).openTooltip(labelPos);
+              }
+              
+            });
+
+            map.on(L.Draw.Event.EDITED, (e) => {
+              const layers = e.layers;
+
+              layers.eachLayer((layer) => {
+                let label = '';
+                let labelPos = null;
+
+                if (layer instanceof L.Polygon || layer instanceof L.Rectangle) {
+
+                  const area = L.GeometryUtil.geodesicArea(layer.getLatLngs()[0]) / 1e6;
+                  label = `${area.toFixed(2)} km²`;
+                  labelPos = layer.getBounds().getCenter();
+
+                } else if (layer instanceof L.Polyline) {
+
+                  const latlngs = layer.getLatLngs();
+                  let totalDistance = 0;
+
+                  for (let i = 0; i < latlngs.length - 1; i++) {
+                    totalDistance += map.distance(latlngs[i], latlngs[i + 1]);
+                  }
+
+                  const totalDistanceInKm = (totalDistance / 1000).toFixed(2);
+                  label = `${totalDistanceInKm} km`;
+
+                  labelPos = layer.getBounds().getCenter();
+
+                } else if (layer instanceof L.Circle) {
+                  const radius = layer.getRadius();
+                  label = `Radio: ${(radius / 1000).toFixed(2)} km`;
+                  labelPos = layer.getLatLng();
+
+                }
+
+                if (label && labelPos) {
+                  layer.unbindTooltip();
+                  layer.bindTooltip(label, {
+                    permanent: true,
+                    direction: 'center',
+                    className: 'distance-label-content',
+                    offset: [0, 0],
+                  }).openTooltip(labelPos);
+                }
+              });
+            });
 
             // Array to hold all layers
             const allLayers = {};
@@ -379,4 +495,3 @@
       </script>
   </body>
 </html>
-``` 
