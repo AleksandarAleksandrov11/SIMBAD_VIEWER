@@ -189,6 +189,7 @@
               layer.addTo(map);
               drawnItems.addLayer(layer);
 
+              // Add the label to the layer
               if (label && labelPos) {
                 layer.bindTooltip(label, {
                   permanent: true,
@@ -200,6 +201,7 @@
               
             });
 
+            // Handle the editing or removal of layers
             map.on(L.Draw.Event.EDITED, (e) => {
               const layers = e.layers;
 
@@ -234,6 +236,7 @@
 
                 }
 
+                // Remove the previous label if it exists and add a new one
                 if (label && labelPos) {
                   layer.unbindTooltip();
                   layer.bindTooltip(label, {
@@ -355,6 +358,17 @@
                   const currentLayer = layers[currentLayerIndex];
                   label.innerHTML = `Showing ${currentLayer.split(':')[1]}`;
                   map.addLayer(allLayers[country][region][category][currentLayer]);
+
+                  const matchingLayer = data[country][region][category].find(layer => layer.layer === currentLayer);
+                  if (matchingLayer) {
+                    const bbox = matchingLayer.url.match(/bbox=([^&]+)/)[1].split(',').map(Number);
+                    const bounds = [
+                      [bbox[1], bbox[0]],
+                      [bbox[3], bbox[2]]
+                    ];
+                    map.fitBounds(bounds, { maxZoom: 12 });
+                  }
+                  
                   currentLayerIndex++;
                   progress.style.width = `${(currentLayerIndex / layers.length) * 100}%`;
                   progressBar.style.display = 'block';
