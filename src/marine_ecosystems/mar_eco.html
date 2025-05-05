@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Maritime Monitoring</title>
+    <title>Marine Ecosystems</title>
     <meta charset="UTF-8" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
@@ -16,6 +16,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.geometryutil/0.10.0/leaflet.geometryutil.min.js"></script>
     <link rel="stylesheet" href="../main/libs/Control.MiniMap.css" />
     <script src="../main/libs/Control.MiniMap.js"></script>
+    <link rel="icon" href="https://simbad.quasarsr.com/wp-content/uploads/2023/10/cropped-favicon-32x32.png"/>
   </head>
 
   <body>
@@ -59,6 +60,8 @@
 
             // The default base layer is the dark mode
             baseLayers["Dark Mode"].addTo(map);
+
+            // Creates the mini map with the light mode base layer
             const miniMapLayer = L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
               format: "text/html",
               subdomains: "abcd",
@@ -67,7 +70,7 @@
               zIndex: 1,
             });
 
-            // Crear el minimapa
+            // Adds the mini map to the main map at the bottom left corner
             const miniMap = new L.Control.MiniMap(miniMapLayer, {
               toggleDisplay: true,
               minimized: false,
@@ -159,7 +162,7 @@
               if (e.layerType === 'polygon' || e.layerType === 'rectangle') {
 
                 const area = L.GeometryUtil.geodesicArea(layer.getLatLngs()[0]) / 1e6;
-                label = `${area.toFixed(2)} km²`;
+                label = `Area: ${area.toFixed(2)} km²`;
                 labelPos = layer.getBounds().getCenter();
 
               } else if (e.layerType === 'polyline') {
@@ -178,7 +181,7 @@
               } else if (e.layerType === 'circle') {
 
                 const radius = layer.getRadius();
-                label = `Radio: ${(radius / 1000).toFixed(2)} km`;
+                label = `Radius: ${(radius / 1000).toFixed(2)} km`;
                 labelPos = layer.getLatLng();
 
               } else if (e.layerType === 'marker' || e.layerType === 'circlemarker') {
@@ -212,7 +215,7 @@
                 if (layer instanceof L.Polygon || layer instanceof L.Rectangle) {
 
                   const area = L.GeometryUtil.geodesicArea(layer.getLatLngs()[0]) / 1e6;
-                  label = `${area.toFixed(2)} km²`;
+                  label = `Area: ${area.toFixed(2)} km²`;
                   labelPos = layer.getBounds().getCenter();
 
                 } else if (layer instanceof L.Polyline) {
@@ -231,7 +234,7 @@
 
                 } else if (layer instanceof L.Circle) {
                   const radius = layer.getRadius();
-                  label = `Radio: ${(radius / 1000).toFixed(2)} km`;
+                  label = `Radius: ${(radius / 1000).toFixed(2)} km`;
                   labelPos = layer.getLatLng();
 
                 }
@@ -334,7 +337,6 @@
                 </div>
               `).join('')}
             `;
-            console.log(menu.innerHTML);
             document.body.appendChild(menu);
 
             // Shows all the layers of each category in order
@@ -469,8 +471,10 @@
             const DownloadButton = L.Control.extend({
               onAdd: function(map) {
                 const button = L.DomUtil.create('button', 'leaflet-control-download');
-                button.innerHTML = 'Download selected layer';
+                button.innerHTML = 'Download selected map';
                 L.DomEvent.disableClickPropagation(button);
+                button.style.visibility = 'hidden';
+
                 button.addEventListener('click', function() {
                   const selectedLayers = [];
 
@@ -491,12 +495,12 @@
                   // Open a new tab for each selected layer
                   selectedLayers.forEach(({ country, region, category, layerName }) => {
                     const matchingLayer = data[country][region][category].find(layer => layer.layer === layerName);
-
                     if (matchingLayer) {
                       window.open(matchingLayer.url, "_blank");
                     }
                   });
                 });
+
                 return button;
               }
             });
@@ -504,6 +508,38 @@
             // Add the download button to the map at the bottom right corner
             const downloadButton = new DownloadButton({ position: 'bottomright' });
             downloadButton.addTo(map);
+
+            // Function to update the visibility of the download button
+            function updateDownloadButtonVisibility() {
+              const selectedLayers = [];
+              
+              // Iterate over all countries, regions, and categories to find active layers
+              Object.keys(allLayers).forEach(country => {
+                Object.keys(allLayers[country]).forEach(region => {
+                  Object.keys(allLayers[country][region]).forEach(category => {
+                    Object.keys(allLayers[country][region][category]).forEach(layerName => {
+                      const layerGroup = allLayers[country][region][category][layerName];
+                      if (map.hasLayer(layerGroup)) {
+                        selectedLayers.push(layerName);
+                      }
+                    });
+                  });
+                });
+              });
+
+              // Show or hide the button based on the number of selected layers
+              const button = document.querySelector('.leaflet-control-download');
+              if (selectedLayers.length > 0) {
+                button.style.visibility = 'visible';
+              } else {
+                button.style.visibility = 'hidden';
+              }
+            }
+
+            // Attach the update function to layer toggle events
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+              checkbox.addEventListener('change', updateDownloadButtonVisibility);
+            });
     
           })
       </script>
