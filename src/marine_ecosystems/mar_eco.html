@@ -16,6 +16,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.geometryutil/0.10.0/leaflet.geometryutil.min.js"></script>
     <link rel="stylesheet" href="../main/libs/Control.MiniMap.css" />
     <script src="../main/libs/Control.MiniMap.js"></script>
+    <script src="../main/libs/leaflet-side-by-side.js"></script>
     <link rel="icon" href="https://simbad.quasarsr.com/wp-content/uploads/2023/10/cropped-favicon-32x32.png"/>
   </head>
 
@@ -320,7 +321,7 @@
                           ${data[country][region][category].map(layer => `
                             <div>
                               <input type="checkbox" id="${region}-${category}-${layer.layer}" data-country="${country}" data-region="${region}" data-category="${category}" data-layer="${layer.layer}">
-                              <label for="${region}-${category}-${layer.layer}">${layer.layer.split(':')[1]}</label>
+                              <label for="${region}-${category}-${layer.layer}">${layer.layer.split(':')[1].split('_')[1]}</label>
                             </div>
                           `).join('')}
                           <div>
@@ -400,18 +401,9 @@
               const category = event.target.getAttribute('data-category');
               const layerName = event.target.getAttribute('data-layer');
               const layerGroup = allLayers[country][region][category][layerName];
-              
+
+              // Add or remove the layer from the map
               if (event.target.checked) {
-
-                document.querySelectorAll(`input[data-country="${country}"][data-region="${region}"][data-category="${category}"][type="checkbox"]:not([id$="-cycle"])`).forEach(checkbox => {
-                  if (checkbox !== event.target && checkbox.checked) {
-                    checkbox.checked = false;
-                    const previousLayer = checkbox.getAttribute('data-layer');
-                    const previousLayerGroup = allLayers[country][region][category][previousLayer];
-                    map.removeLayer(previousLayerGroup);
-                  }
-                });
-
                 map.addLayer(layerGroup);
 
                 const matchingLayer = data[country][region][category].find(layer => layer.layer === layerName);
@@ -421,10 +413,51 @@
                   [bbox[3], bbox[2]]
                 ];
                 map.fitBounds(bounds, { maxZoom: 12 });
-                
               } else {
                 map.removeLayer(layerGroup);
               }
+
+              // Check how many layers are selected in the category
+              const selectedLayers = Array.from(document.querySelectorAll(`input[data-country="${country}"][data-region="${region}"][data-category="${category}"]:checked`))
+                .map(input => input.getAttribute('data-layer'));
+
+              // Creates the comparison checkbox
+              const comparisonContainer = document.getElementById(`${region}-${category}-comparison`);
+              // If two layers are selected, show the comparison checkbox
+              if (selectedLayers.length === 2) {
+                if (!comparisonContainer) {
+                  const layersDiv = document.getElementById(`${region}-${category}-layers`);
+                  const comparisonDiv = document.createElement('div');
+                  comparisonDiv.id = `${region}-${category}-comparison`;
+                  comparisonDiv.innerHTML = `
+                    <button id="${region}-${category}-compare" data-country="${country}" data-region="${region}" data-category="${category}" style="background-color: #007bff; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">
+                      Compare selected layers
+                    </button>
+                  `;
+                  layersDiv.appendChild(comparisonDiv);
+
+                  // Add event listener for the comparison checkbox
+                  document.getElementById(`${region}-${category}-compare`).addEventListener('click', event => {
+                    if (event.target.checked) {
+                      compareLayers(selectedLayers, country, region, category);
+                    }
+                  });
+
+                }
+              } else {
+                // Remove the comparison checkbox if it exists
+                if (comparisonContainer) {
+                  comparisonContainer.remove();
+                }
+              }
+            }
+
+            function compareLayers(selectedLayers,country, region, category){
+              const layer1 = allLayers[country][region][category][selectedLayers[0]];
+              const layer2 = allLayers[country][region][category][selectedLayers[1]];
+
+              window.open('../marine_ecosystems/comparation_layers.html', 'Popup', 'width=600,height=400');
+
             }
 
             document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
