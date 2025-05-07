@@ -430,7 +430,7 @@
                   const comparisonDiv = document.createElement('div');
                   comparisonDiv.id = `${region}-${category}-comparison`;
                   comparisonDiv.innerHTML = `
-                    <button id="${region}-${category}-compare" data-country="${country}" data-region="${region}" data-category="${category}" style="background-color: #007bff; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">
+                    <button id="${region}-${category}-compare" class="compare_button" data-country="${country}" data-region="${region}" data-category="${category}">
                       Compare selected layers
                     </button>
                   `;
@@ -438,9 +438,7 @@
 
                   // Add event listener for the comparison checkbox
                   document.getElementById(`${region}-${category}-compare`).addEventListener('click', event => {
-                    if (event.target.checked) {
                       compareLayers(selectedLayers, country, region, category);
-                    }
                   });
 
                 }
@@ -452,14 +450,21 @@
               }
             }
 
+            // Open a new window with the comparison of the selected layers
             function compareLayers(selectedLayers,country, region, category){
-              const layer1 = allLayers[country][region][category][selectedLayers[0]];
-              const layer2 = allLayers[country][region][category][selectedLayers[1]];
+              const layer1 = data[country][region][category].find(layer => layer.layer === selectedLayers[0]);
+              const layer2 = data[country][region][category].find(layer => layer.layer === selectedLayers[1]);
 
-              window.open('../marine_ecosystems/comparation_layers.html', 'Popup', 'width=600,height=400');
+              const layer1URL = encodeURIComponent(layer1.url);
+              const layer2URL = encodeURIComponent(layer2.url);
+
+              const popupUrl = `comparation_layers.html?layer1=${layer1URL}&layer2=${layer2URL}`;
+              console.log(popupUrl);
+              const popup = window.open(popupUrl, 'Popup', 'width=800,height=600');
 
             }
 
+            // For each checkbox, add an event listener to toggle the layer
             document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
               checkbox.addEventListener('change', toggleLayer);
             });

@@ -3,10 +3,16 @@
 <head>
   <title>Layer Comparison</title>
   <meta charset="UTF-8">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+  crossorigin="">
+  </script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+  crossorigin=""/>
   <script src="../main/libs/leaflet-side-by-side.js"></script>
-  <link rel="stylesheet" href="../main/libs/leaflet-side-by-side.css">
+  <link rel="icon" href="https://simbad.quasarsr.com/wp-content/uploads/2023/10/cropped-favicon-32x32.png"/>
+  <link rel="stylesheet" href="../marine_ecosystems/css/mar_eco.css" />
   <style>
     #map {
       width: 100%;
@@ -29,6 +35,54 @@
         zIndex: 1
     }).addTo(map);
 
+    // Gets the URL parameters for layer1 and layer2
+    const urlParams = new URLSearchParams(window.location.search);
+    const layer1 = decodeURIComponent(urlParams.get('layer1'));
+    const layer2 = decodeURIComponent(urlParams.get('layer2'));
+
+    // Zooms the map to the bounding box of the layers
+    const bbox = layer1.match(/bbox=([^&]+)/)[1].split(',').map(Number);
+    const bounds = [
+      [bbox[1], bbox[0]],
+      [bbox[3], bbox[2]]
+    ];
+    map.fitBounds(bounds, { maxZoom: 12 });
+
+    // Gets the layer name from the URL
+    const getLayerName = (url) => {
+      const match = url.match(/layers=([^&]+)/);
+      return match ? match[1] : null;
+    };
+
+    const layer1Name = getLayerName(layer1);
+    const layer2Name = getLayerName(layer2);
+
+    console.log("Layer 1 Name: ", layer1);
+
+    // Adds the left layer to the map
+    const leftLayer = L.tileLayer.wms(layer1, {
+        layers: layer1Name,
+        format: "image/png",
+        maxZoom: 19,
+        noWrap: true,
+        transparent: true,
+        zIndex: 10
+    });
+    map.addLayer(leftLayer);
+
+    // Adds the right layer to the map
+    const rightLayer = L.tileLayer.wms(layer2, {
+        layers: layer2Name,
+        format: "image/png",
+        maxZoom: 19,
+        noWrap: true,
+        transparent: true,
+        zIndex: 11
+    });
+    map.addLayer(rightLayer);
+
+    // Adds the side-by-side control to the map
+    L.control.sideBySide(leftLayer, rightLayer).addTo(map);
 
   </script>
 </body>
