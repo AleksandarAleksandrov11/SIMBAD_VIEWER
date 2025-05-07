@@ -23,17 +23,67 @@
 <body>
   <div id="map"></div>
   <script>
-    // Initialize the map
-    const map = L.map('map').setView([39.19, 2.52], 3);
+    // Initialize the map but only the slider can be moved
+      const map = L.map('map', {
+      center: [39.19, 2.52],
+      zoom: 3,
+      zoomControl: false,
+      dragging: false,
+      scrollWheelZoom: false,
+      doubleClickZoom: false,
+      boxZoom: false,
+      keyboard: false,
+      touchZoom: false
+    });
 
-    // Add base layer
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+    const baseLayers = {
+      "Dark Mode": L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
         format: "text/html",
         subdomains: "abcd",
         maxZoom: 19,
         noWrap: true,
         zIndex: 1
-    }).addTo(map);
+      }),
+      "Light Mode": L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+        format: "text/html",
+        subdomains: "abcd",
+        maxZoom: 19,
+        noWrap: true,
+        zIndex: 1
+      }),
+      "Satellite": L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
+        format: "text/html",
+        subdomains: "abcd",
+        maxZoom: 19,
+        noWrap: true,
+        zIndex: 1
+      })
+    };
+
+    // The default base layer is the dark mode
+    baseLayers["Dark Mode"].addTo(map);
+
+    // Button to change the base layer
+    const BaseChanger = L.Control.extend({
+      onAdd: function(map) {
+        const button = L.DomUtil.create('button', 'leaflet-control-download');
+        button.innerHTML = 'Change base layer';
+        button.addEventListener('click', function() {
+          const currentBaseLayer = Object.keys(baseLayers).find(key => map.hasLayer(baseLayers[key]));
+          const baseLayerKeys = Object.keys(baseLayers);
+          const currentIndex = baseLayerKeys.indexOf(currentBaseLayer);
+          const nextIndex = (currentIndex + 1) % baseLayerKeys.length;
+          const nextBaseLayer = baseLayerKeys[nextIndex];
+          map.removeLayer(baseLayers[currentBaseLayer]);
+          map.addLayer(baseLayers[nextBaseLayer]);
+        });
+        return button;
+      }
+    });
+
+    // Adds a button to change the base layer to the bottom left corner of the map
+    const baseChangeButton = new BaseChanger({ position: 'bottomright' });
+    baseChangeButton.addTo(map);
 
     // Gets the URL parameters for layer1 and layer2
     const urlParams = new URLSearchParams(window.location.search);
@@ -60,29 +110,40 @@
     console.log("Layer 1 Name: ", layer1);
 
     // Adds the left layer to the map
-    const leftLayer = L.tileLayer.wms(layer1, {
-        layers: layer1Name,
-        format: "image/png",
-        maxZoom: 19,
-        noWrap: true,
-        transparent: true,
-        zIndex: 10
+    const leftLayer = L.tileLayer.wms(layer1.split("?")[0], {
+      layers: layer1Name,
+      format: "image/png",
+      transparent: true,
+      version: "1.1.0",
+      maxZoom: 19,
+      noWrap: true,
+      zIndex: 10
     });
     map.addLayer(leftLayer);
 
     // Adds the right layer to the map
-    const rightLayer = L.tileLayer.wms(layer2, {
+    const rightLayer = L.tileLayer.wms(layer2.split("?")[0], {
         layers: layer2Name,
         format: "image/png",
         maxZoom: 19,
         noWrap: true,
         transparent: true,
+        version:"1.1.0",
         zIndex: 11
     });
     map.addLayer(rightLayer);
 
     // Adds the side-by-side control to the map
     L.control.sideBySide(leftLayer, rightLayer).addTo(map);
+
+    // Adds a watermark to the map
+    const watermark = L.imageOverlay('../main/main_images/simbad_watermark.png',
+      [
+        [bbox[1], bbox[0]],
+        [bbox[3], bbox[2]]
+      ],
+      { opacity: 0.15, zIndex: 11 }
+    ).addTo(map);
 
   </script>
 </body>
