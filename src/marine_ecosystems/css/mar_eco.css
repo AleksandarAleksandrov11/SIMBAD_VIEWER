@@ -25,7 +25,7 @@ html, body, #app {
     z-index: 1000;
     max-width: 450px;
     overflow-y: auto;
-    max-height: 80vh;
+    max-height: 50vh;
 }
 .menu .country {
     display: block;

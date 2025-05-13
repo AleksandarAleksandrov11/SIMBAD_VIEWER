@@ -275,7 +275,6 @@
               return group;
             }
 
-
             // Adds the layers in the allLayers array 
             Object.keys(data).forEach(country => {
               Object.keys(data[country]).forEach(region => {
@@ -461,7 +460,7 @@
               // Center the popup in the middle of the screen
               const left = (window.innerWidth - 800) / 2;
               const top = (window.innerHeight - 600) / 2;
-              const popupUrl = `comparation_layers.html?layer1=${layer1URL}&layer2=${layer2URL}`;
+              const popupUrl = `comparison_layers.html?layer1=${layer1URL}&layer2=${layer2URL}`;
 
               const popup = window.open(popupUrl,'Popup',`width=800,height=600,top=${top},left=${left}`);
               
@@ -502,9 +501,9 @@
                 const layersDiv = event.target.nextElementSibling;
                 if (layersDiv.style.display === "block") {
                   layersDiv.style.display = "none";
-                  } else {
+                } else {
                       layersDiv.style.display = "block";
-              }
+                }
               });
             });
     
@@ -512,7 +511,7 @@
             const DownloadButton = L.Control.extend({
               onAdd: function(map) {
                 const button = L.DomUtil.create('button', 'leaflet-control-download');
-                button.innerHTML = 'Download selected map';
+                button.innerHTML = 'Download selected maps';
                 L.DomEvent.disableClickPropagation(button);
                 button.style.visibility = 'hidden';
 

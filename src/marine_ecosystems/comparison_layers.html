@@ -27,13 +27,10 @@
       const map = L.map('map', {
       center: [39.19, 2.52],
       zoom: 3,
-      zoomControl: false,
       dragging: false,
-      scrollWheelZoom: false,
-      doubleClickZoom: false,
-      boxZoom: false,
       keyboard: false,
-      touchZoom: false
+      touchZoom: false,
+      doubleClickZoom: false
     });
 
     const baseLayers = {
@@ -81,9 +78,30 @@
       }
     });
 
-    // Adds a button to change the base layer to the bottom left corner of the map
+    // Adds a button to change the base layer to the bottom right corner
     const baseChangeButton = new BaseChanger({ position: 'bottomright' });
     baseChangeButton.addTo(map);
+
+    // Button to center the map
+    const CenterButton = L.Control.extend({
+      onAdd: function(map) {
+        const button = L.DomUtil.create('button', 'leaflet-control-download');
+        button.innerHTML = 'Center map';
+        button.addEventListener('click', function() {
+          const bbox = layer1.match(/bbox=([^&]+)/)[1].split(',').map(Number);
+          const bounds = [
+            [bbox[1], bbox[0]],
+            [bbox[3], bbox[2]]
+          ];
+          map.fitBounds(bounds, { maxZoom: 12 });
+        });
+        return button;
+      }
+    });
+
+    // Adds a button to center the map to the bottom left corner
+    const centerButton = new CenterButton({ position: 'bottomleft' });
+    centerButton.addTo(map);
 
     // Gets the URL parameters for layer1 and layer2
     const urlParams = new URLSearchParams(window.location.search);
@@ -107,8 +125,6 @@
     const layer1Name = getLayerName(layer1);
     const layer2Name = getLayerName(layer2);
 
-    console.log("Layer 1 Name: ", layer1);
-
     // Adds the left layer to the map
     const leftLayer = L.tileLayer.wms(layer1.split("?")[0], {
       layers: layer1Name,
@@ -129,7 +145,7 @@
         noWrap: true,
         transparent: true,
         version:"1.1.0",
-        zIndex: 11
+        zIndex: 10
     });
     map.addLayer(rightLayer);
 
