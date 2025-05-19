@@ -18,6 +18,9 @@
     <script src="../main/libs/Control.MiniMap.js"></script>
     <script src="../main/libs/leaflet-side-by-side.js"></script>
     <link rel="icon" href="https://simbad.quasarsr.com/wp-content/uploads/2023/10/cropped-favicon-32x32.png"/>
+    <script src="../main/libs/leaflet.browser.print.min.js"></script>
+    <script src="../main/libs/L.Control.MousePosition.js"></script>
+    <link rel="stylesheet" href="../main/libs/L.Control.MousePosition.css"/>
   </head>
 
   <body>
@@ -101,6 +104,15 @@
             // Adds a button to change the base layer to the bottom left corner of the map
             const baseChangeButton = new BaseChanger({ position: 'bottomright' });
             baseChangeButton.addTo(map);
+
+            // Add a print control to the map
+            L.control.browserPrint().addTo(map);
+
+            // Add a scale control to the map
+            L.control.scale({ position: 'bottomleft' }).addTo(map);
+
+            // Add a mouse position control to the map
+            L.control.mousePosition({ position: 'bottomright' }).addTo(map);
 
             // Disables click propagation on the buttons 
             const buttons = document.querySelectorAll('button, input, .menu');

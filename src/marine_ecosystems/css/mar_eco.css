@@ -161,3 +161,6 @@ html, body, #app {
 .compare_button:hover{
     background-color: #4187d3;
 }
+.leaflet-bottom.leaflet-left .leaflet-control-scale {
+  left: 5px;
+}
