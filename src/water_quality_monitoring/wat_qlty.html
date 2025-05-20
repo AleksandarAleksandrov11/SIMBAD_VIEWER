@@ -1,26 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Maritime Monitoring</title>
-    <meta charset="UTF-8" />
+    <title>Water Quality Monitoring</title>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-      crossorigin=""/>
-    <link rel="stylesheet" href="../marine_ecosystems/css/mar_eco.css" />
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <link rel="stylesheet" href="../water_quality_monitoring/css/wat_qlty.css"/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-      crossorigin="">
-    </script>
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.geometryutil/0.10.0/leaflet.geometryutil.min.js"></script>
     <link rel="stylesheet" href="../main/libs/Control.MiniMap.css" />
     <script src="../main/libs/Control.MiniMap.js"></script>
+    <script src="../main/libs/leaflet-side-by-side.js"></script>
     <link rel="icon" href="https://simbad.quasarsr.com/wp-content/uploads/2023/10/cropped-favicon-32x32.png"/>
+    <script src="../main/libs/leaflet.browser.print.min.js"></script>
+    <script src="../main/libs/L.Control.MousePosition.js"></script>
+    <link rel="stylesheet" href="../main/libs/L.Control.MousePosition.css"/>
+    <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
+    <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
   </head>
 
   <body>
-    <div id="app"></div>
+    <div id="app">
 
     <a href="../main/index.html">
       <img src="../main/main_images/logo-simbad.jpg" class="simbad_logo" alt="SIMBAD LOGO" />
@@ -28,10 +31,10 @@
 
     <script>
         // Reads the layers.json file and creates a map
-        fetch('../marine_ecosystems/util/mar_eco_layers.json')
+        fetch('../water_quality_monitoring/util/wat_qlty_layers.json')
           .then(response => response.json())
           .then(data => {
-            const map = L.map("app").setView([39.19, 2.52], 3);
+            const map = L.map("app",{fullscreenControl: true}).setView([39.19, 2.52], 3);
 
             // Array to hold all base layers
             const baseLayers = {
@@ -60,6 +63,8 @@
 
             // The default base layer is the dark mode
             baseLayers["Dark Mode"].addTo(map);
+
+            // Creates the mini map with the light mode base layer
             const miniMapLayer = L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
               format: "text/html",
               subdomains: "abcd",
@@ -68,11 +73,13 @@
               zIndex: 1,
             });
 
-            // Crear el minimapa
+            // Adds the mini map to the main map at the bottom left corner
             const miniMap = new L.Control.MiniMap(miniMapLayer, {
               toggleDisplay: true,
               minimized: false,
               position: "bottomleft",
+              width: 140,
+              height: 140,
             }).addTo(map);
 
             // Button that changes the base layer
@@ -99,8 +106,33 @@
             const baseChangeButton = new BaseChanger({ position: 'bottomright' });
             baseChangeButton.addTo(map);
 
+            // Button to center the map
+            const CenterMap = L.Control.extend({
+              onAdd: function(map){
+                const button = L.DomUtil.create('button', 'leaflet-control-download');
+                button.innerHTML = 'Center map';
+                button.addEventListener('click', function() {
+                  map.setView([39.19, 2.52], 3);
+                });
+                return button;
+              }
+            });
+
+            // Adds a button to center the map to the bottom right corner of the map
+            const centerMapButton = new CenterMap({ position: 'bottomright' });
+            centerMapButton.addTo(map);
+
+            // Add a print control to the map
+            L.control.browserPrint().addTo(map);
+
+            // Add a scale control to the map
+            L.control.scale({ position: 'bottomleft' }).addTo(map);
+
+            // Add a mouse position control to the map
+            L.control.mousePosition({ position: 'bottomright' }).addTo(map);
+
             // Disables click propagation on the buttons 
-            const buttons = document.querySelectorAll('button, input, .menu');
+            const buttons = document.querySelectorAll('button, input');
             buttons.forEach(button => {
               L.DomEvent.disableClickPropagation(button);
             });
@@ -160,7 +192,7 @@
               if (e.layerType === 'polygon' || e.layerType === 'rectangle') {
 
                 const area = L.GeometryUtil.geodesicArea(layer.getLatLngs()[0]) / 1e6;
-                label = `${area.toFixed(2)} km²`;
+                label = `Area: ${area.toFixed(2)} km²`;
                 labelPos = layer.getBounds().getCenter();
 
               } else if (e.layerType === 'polyline') {
@@ -179,7 +211,7 @@
               } else if (e.layerType === 'circle') {
 
                 const radius = layer.getRadius();
-                label = `Radio: ${(radius / 1000).toFixed(2)} km`;
+                label = `Radius: ${(radius / 1000).toFixed(2)} km`;
                 labelPos = layer.getLatLng();
 
               } else if (e.layerType === 'marker' || e.layerType === 'circlemarker') {
@@ -213,7 +245,7 @@
                 if (layer instanceof L.Polygon || layer instanceof L.Rectangle) {
 
                   const area = L.GeometryUtil.geodesicArea(layer.getLatLngs()[0]) / 1e6;
-                  label = `${area.toFixed(2)} km²`;
+                  label = `Area: ${area.toFixed(2)} km²`;
                   labelPos = layer.getBounds().getCenter();
 
                 } else if (layer instanceof L.Polyline) {
@@ -232,7 +264,7 @@
 
                 } else if (layer instanceof L.Circle) {
                   const radius = layer.getRadius();
-                  label = `Radio: ${(radius / 1000).toFixed(2)} km`;
+                  label = `Radius: ${(radius / 1000).toFixed(2)} km`;
                   labelPos = layer.getLatLng();
 
                 }
@@ -271,7 +303,6 @@
               const group = L.layerGroup([layer, watermark]);
               return group;
             }
-
 
             // Adds the layers in the allLayers array 
             Object.keys(data).forEach(country => {
@@ -318,7 +349,7 @@
                           ${data[country][region][category].map(layer => `
                             <div>
                               <input type="checkbox" id="${region}-${category}-${layer.layer}" data-country="${country}" data-region="${region}" data-category="${category}" data-layer="${layer.layer}">
-                              <label for="${region}-${category}-${layer.layer}">${layer.layer.split(':')[1]}</label>
+                              <label for="${region}-${category}-${layer.layer}">${layer.layer.split(':')[1].split('_')[1]}</label>
                             </div>
                           `).join('')}
                           <div>
@@ -334,9 +365,12 @@
                   `).join('')}
                 </div>
               `).join('')}
-            `;
-            console.log(menu.innerHTML);
-            document.body.appendChild(menu);
+            `;  
+
+            // Append the menu to the app div and disable click propagation to avoid map interaction
+            const app = document.getElementById('app');
+            app.appendChild(menu);
+            L.DomEvent.disableClickPropagation(document.querySelector('.menu'));
 
             // Shows all the layers of each category in order
             function showAllLayersInOrder(event) {
@@ -399,18 +433,9 @@
               const category = event.target.getAttribute('data-category');
               const layerName = event.target.getAttribute('data-layer');
               const layerGroup = allLayers[country][region][category][layerName];
-              
+
+              // Add or remove the layer from the map
               if (event.target.checked) {
-
-                document.querySelectorAll(`input[data-country="${country}"][data-region="${region}"][data-category="${category}"][type="checkbox"]:not([id$="-cycle"])`).forEach(checkbox => {
-                  if (checkbox !== event.target && checkbox.checked) {
-                    checkbox.checked = false;
-                    const previousLayer = checkbox.getAttribute('data-layer');
-                    const previousLayerGroup = allLayers[country][region][category][previousLayer];
-                    map.removeLayer(previousLayerGroup);
-                  }
-                });
-
                 map.addLayer(layerGroup);
 
                 const matchingLayer = data[country][region][category].find(layer => layer.layer === layerName);
@@ -420,12 +445,12 @@
                   [bbox[3], bbox[2]]
                 ];
                 map.fitBounds(bounds, { maxZoom: 12 });
-                
               } else {
                 map.removeLayer(layerGroup);
               }
             }
 
+            // For each checkbox, add an event listener to toggle the layer
             document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
               checkbox.addEventListener('change', toggleLayer);
             });
@@ -460,9 +485,9 @@
                 const layersDiv = event.target.nextElementSibling;
                 if (layersDiv.style.display === "block") {
                   layersDiv.style.display = "none";
-                  } else {
+                } else {
                       layersDiv.style.display = "block";
-              }
+                }
               });
             });
     
@@ -470,8 +495,10 @@
             const DownloadButton = L.Control.extend({
               onAdd: function(map) {
                 const button = L.DomUtil.create('button', 'leaflet-control-download');
-                button.innerHTML = 'Download selected layer';
+                button.innerHTML = 'Download selected maps';
                 L.DomEvent.disableClickPropagation(button);
+                button.style.visibility = 'hidden';
+
                 button.addEventListener('click', function() {
                   const selectedLayers = [];
 
@@ -492,12 +519,12 @@
                   // Open a new tab for each selected layer
                   selectedLayers.forEach(({ country, region, category, layerName }) => {
                     const matchingLayer = data[country][region][category].find(layer => layer.layer === layerName);
-
                     if (matchingLayer) {
                       window.open(matchingLayer.url, "_blank");
                     }
                   });
                 });
+
                 return button;
               }
             });
@@ -505,8 +532,41 @@
             // Add the download button to the map at the bottom right corner
             const downloadButton = new DownloadButton({ position: 'bottomright' });
             downloadButton.addTo(map);
+
+            // Function to update the visibility of the download button
+            function updateDownloadButtonVisibility() {
+              const selectedLayers = [];
+              
+              // Iterate over all countries, regions, and categories to find active layers
+              Object.keys(allLayers).forEach(country => {
+                Object.keys(allLayers[country]).forEach(region => {
+                  Object.keys(allLayers[country][region]).forEach(category => {
+                    Object.keys(allLayers[country][region][category]).forEach(layerName => {
+                      const layerGroup = allLayers[country][region][category][layerName];
+                      if (map.hasLayer(layerGroup)) {
+                        selectedLayers.push(layerName);
+                      }
+                    });
+                  });
+                });
+              });
+
+              // Show or hide the button based on the number of selected layers
+              const button = document.querySelector('.leaflet-control-download');
+              if (selectedLayers.length > 0) {
+                button.style.visibility = 'visible';
+              } else {
+                button.style.visibility = 'hidden';
+              }
+            }
+
+            // Attach the update function to layer toggle events
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+              checkbox.addEventListener('change', updateDownloadButtonVisibility);
+            });
     
           })
       </script>
+    </div>
   </body>
 </html>

@@ -2,15 +2,12 @@
 <html lang="en">
   <head>
     <title>Marine Ecosystems</title>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-      crossorigin=""/>
-    <link rel="stylesheet" href="../marine_ecosystems/css/mar_eco.css" />
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <link rel="stylesheet" href="../marine_ecosystems/css/mar_eco.css"/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-      crossorigin="">
-    </script>
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.geometryutil/0.10.0/leaflet.geometryutil.min.js"></script>
@@ -21,10 +18,12 @@
     <script src="../main/libs/leaflet.browser.print.min.js"></script>
     <script src="../main/libs/L.Control.MousePosition.js"></script>
     <link rel="stylesheet" href="../main/libs/L.Control.MousePosition.css"/>
+    <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
+    <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
   </head>
 
   <body>
-    <div id="app"></div>
+    <div id="app">
 
     <a href="../main/index.html">
       <img src="../main/main_images/logo-simbad.jpg" class="simbad_logo" alt="SIMBAD LOGO" />
@@ -35,7 +34,7 @@
         fetch('../marine_ecosystems/util/mar_eco_layers.json')
           .then(response => response.json())
           .then(data => {
-            const map = L.map("app").setView([39.19, 2.52], 3);
+            const map = L.map("app",{fullscreenControl: true}).setView([39.19, 2.52], 3);
 
             // Array to hold all base layers
             const baseLayers = {
@@ -79,6 +78,8 @@
               toggleDisplay: true,
               minimized: false,
               position: "bottomleft",
+              width: 140,
+              height: 140,
             }).addTo(map);
 
             // Button that changes the base layer
@@ -105,6 +106,22 @@
             const baseChangeButton = new BaseChanger({ position: 'bottomright' });
             baseChangeButton.addTo(map);
 
+            // Button to center the map
+            const CenterMap = L.Control.extend({
+              onAdd: function(map){
+                const button = L.DomUtil.create('button', 'leaflet-control-download');
+                button.innerHTML = 'Center map';
+                button.addEventListener('click', function() {
+                  map.setView([39.19, 2.52], 3);
+                });
+                return button;
+              }
+            });
+
+            // Adds a button to center the map to the bottom right corner of the map
+            const centerMapButton = new CenterMap({ position: 'bottomright' });
+            centerMapButton.addTo(map);
+
             // Add a print control to the map
             L.control.browserPrint().addTo(map);
 
@@ -115,7 +132,7 @@
             L.control.mousePosition({ position: 'bottomright' }).addTo(map);
 
             // Disables click propagation on the buttons 
-            const buttons = document.querySelectorAll('button, input, .menu');
+            const buttons = document.querySelectorAll('button, input');
             buttons.forEach(button => {
               L.DomEvent.disableClickPropagation(button);
             });
@@ -349,7 +366,11 @@
                 </div>
               `).join('')}
             `;
-            document.body.appendChild(menu);
+
+            // Append the menu to the app div and disable click propagation to avoid map interaction
+            const app = document.getElementById('app');
+            app.appendChild(menu);
+            L.DomEvent.disableClickPropagation(document.querySelector('.menu'));
 
             // Shows all the layers of each category in order
             function showAllLayersInOrder(event) {
@@ -595,5 +616,6 @@
     
           })
       </script>
+    </div>
   </body>
 </html>

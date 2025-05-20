@@ -9,8 +9,8 @@ html, body, #app {
 
 .simbad_logo {
     position: fixed;
-    top: 10px;
-    left: 5%;
+    top: 1%;
+    left: 4%;
     width: 100px;
     height: auto;
     z-index: 1000;
@@ -25,7 +25,7 @@ html, body, #app {
     z-index: 1000;
     max-width: 450px;
     overflow-y: auto;
-    max-height: 80vh;
+    max-height: 50vh;
 }
 .menu .country {
     display: block;
@@ -149,4 +149,63 @@ html, body, #app {
   }
 .save{
     margin-top: 5px;
+}
+.compare_button{
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.compare_button:hover{
+    background-color: #4187d3;
+}
+.leaflet-bottom.leaflet-left .leaflet-control-scale {
+  left: 3%;
+}
+@media (max-width: 1366px) {
+    .simbad_logo {
+        width: 80px;
+    }
+    .leaflet-bottom.leaflet-left .leaflet-control-scale {
+        left: 35%;
+    }
+    .leaflet-draw-toolbar a {
+        width: 28px !important;
+        height: 28px !important;
+        line-height: 28px !important;
+    }
+}
+@media (max-width: 992px) {
+    .simbad_logo {
+        width: 100px;
+        left: 6%;
+    }
+    .leaflet-bottom.leaflet-left .leaflet-control-scale {
+        left: 3%;
+    }
+    .leaflet-draw-toolbar a {
+        width: 28px !important;
+        height: 28px !important;
+        line-height: 28px !important;
+    }
+}
+@media (max-width: 667px) {
+    .simbad_logo {
+        width: 60px;
+        top: 2%;
+        left: 13%;
+    }
+    .leaflet-bottom.leaflet-left .leaflet-control-scale {
+        left: 3%;
+    }
+    .leaflet-draw-toolbar a {
+        width: 28px !important;
+        height: 28px !important;
+        line-height: 28px !important;
+    }
+    .leaflet-control-download {
+        font-size: 10px;
+    }
 }
