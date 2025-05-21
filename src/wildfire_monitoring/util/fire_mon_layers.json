@@ -1,0 +1,44 @@
+{
+  "Portugal": {
+    "Lisbon": {
+        "Wildfire Monitoring": [ 
+            {
+              "layer": "sim:S2B_MSI_2024_01_24_11_30_31_T29SMD_with_alpha",
+              "url": "https://pcfs.quasarsr.com/geoserver/sim/wms?service=WMS&version=1.1.0&request=GetMap&layers=sim:S2B_MSI_2024_01_24_11_30_31_T29SMD_with_alpha&bbox=-10.16756534576416,38.7552375793457,-8.886133193969727,39.750221252441406&width=768&height=596&srs=EPSG:4326&format=image/geotiff"
+            },
+            {
+              "layer": "sim:S2B_MSI_2024_12_29_11_30_48_T29SMC_with_alpha",
+              "url": "https://pcfs.quasarsr.com/geoserver/sim/wms?service=WMS&version=1.1.0&request=GetMap&layers=sim:S2B_MSI_2024_12_29_11_30_48_T29SMC_with_alpha&bbox=-10.152692794799805,37.85399627685547,-8.88758373260498,38.84895324707031&width=768&height=604&srs=EPSG:4326&format=image/geotiff"
+            }
+          ]
+    },
+    "Setubal": {
+        "Wildfire Monitoring": [
+            {
+              "layer": "sim:S2B_MSI_2024_12_29_11_30_45_T29SNC_with_alpha",
+              "url": "https://pcfs.quasarsr.com/geoserver/sim/wms?service=WMS&version=1.1.0&request=GetMap&layers=sim:S2B_MSI_2024_12_29_11_30_45_T29SNC_with_alpha&bbox=-9.00017261505127,37.852874755859375,-7.735098361968994,38.84895324707031&width=768&height=604&srs=EPSG:4326&format=image/geotiff"
+            }
+          ]
+    }
+  },
+  "Spain": {
+    "Estremadura": {
+        "Caceres": [
+            {
+              "layer": "sim:Pinofrank",
+              "url": "https://pcfs.quasarsr.com/geoserver/sim/wms?service=WMS&version=1.1.0&request=GetMap&layers=sim:Pinofrank&bbox=-6.532682852432621,40.21559350812422,-6.2887501357589315,40.3405650126487&width=768&height=501&srs=EPSG:4326&format=image/geotiff"
+            }
+          ]
+          
+    },
+    "Catalonia": {
+        "Castellon": [
+            {
+              "layer": "sim:Castellon",
+              "url": "https://pcfs.quasarsr.com/geoserver/sim/wms?service=WMS&version=1.1.0&request=GetMap&layers=sim:Castellon&bbox=-0.65220833221765,40.04435995448336,-0.5377487422035949,40.112492034929375&width=768&height=586&srs=EPSG:4326&format=image/geotiff"
+            }
+          ]
+          
+    }
+  }
+}

@@ -349,16 +349,9 @@
                           ${data[country][region][category].map(layer => `
                             <div>
                               <input type="checkbox" id="${region}-${category}-${layer.layer}" data-country="${country}" data-region="${region}" data-category="${category}" data-layer="${layer.layer}">
-                              <label for="${region}-${category}-${layer.layer}">${layer.layer.split(':')[1].split('_')[1]}</label>
+                              <label for="${region}-${category}-${layer.layer}">${layer.layer.split(':')[1].split('_')[1]} ${layer.layer.split(':')[1].split('_')[2]} ${layer.layer.split(':')[1].split('_')[8]}</label>
                             </div>
                           `).join('')}
-                          <div>
-                            <input type="checkbox" id="${region}-${category}-cycle" data-country="${country}" data-region="${region}" data-category="${category}">
-                            <label for="${region}-${category}-cycle">Show layers in order</label>
-                          </div>
-                          <div id="progress-bar-${region}-${category}" class="progress-bar" style="display: none;">
-                            <div id="progress-${region}-${category}" class="progress"></div>
-                          </div>
                         </div>
                       `).join('')}
                     </div>
@@ -372,54 +365,6 @@
             app.appendChild(menu);
             L.DomEvent.disableClickPropagation(document.querySelector('.menu'));
 
-            // Shows all the layers of each category in order
-            function showAllLayersInOrder(event) {
-              const country = event.target.getAttribute('data-country');
-              const region = event.target.getAttribute('data-region');
-              const category = event.target.getAttribute('data-category');
-              const layers = Object.keys(allLayers[country][region][category]);
-              const progress = document.getElementById(`progress-${region}-${category}`);
-              const progressBar = document.getElementById(`progress-bar-${region}-${category}`);
-              const label = document.querySelector(`label[for="${region}-${category}-cycle"]`);
-              let currentLayerIndex = 0;
-
-              function showNextLayer() {
-                if (currentLayerIndex > 0) {
-                  const lastLayer = layers[currentLayerIndex - 1];
-                  map.removeLayer(allLayers[country][region][category][lastLayer]);
-                }
-
-                if (currentLayerIndex < layers.length) {
-                  const currentLayer = layers[currentLayerIndex];
-                  label.innerHTML = `Showing ${currentLayer.split(':')[1]}`;
-                  map.addLayer(allLayers[country][region][category][currentLayer]);
-
-                  const matchingLayer = data[country][region][category].find(layer => layer.layer === currentLayer);
-                  if (matchingLayer) {
-                    const bbox = matchingLayer.url.match(/bbox=([^&]+)/)[1].split(',').map(Number);
-                    const bounds = [
-                      [bbox[1], bbox[0]],
-                      [bbox[3], bbox[2]]
-                    ];
-                    map.fitBounds(bounds, { maxZoom: 12 });
-                  }
-                  
-                  currentLayerIndex++;
-                  progress.style.width = `${(currentLayerIndex / layers.length) * 100}%`;
-                  progressBar.style.display = 'block';
-                  setTimeout(showNextLayer, 2500);
-                } else {
-                  label.innerHTML = `Show layers in order`;
-                  event.target.checked = false;
-                  progress.style.width = `0%`;
-                  progressBar.style.display = 'none';
-                }
-              }
-
-              if (event.target.checked) {
-                showNextLayer();
-              }
-            }
 
             // Gets all the checkboxes that end with -cycle and makes them show the layers in order when checked
             document.querySelectorAll('input[id$="-cycle"]').forEach(checkbox => {

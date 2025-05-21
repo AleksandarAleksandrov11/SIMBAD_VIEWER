@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Wildfire Monitoring</title>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <link rel="stylesheet" href="../wildfire_monitoring/css/fire_mon.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.geometryutil/0.10.0/leaflet.geometryutil.min.js"></script>
+    <link rel="stylesheet" href="../main/libs/Control.MiniMap.css" />
+    <script src="../main/libs/Control.MiniMap.js"></script>
+    <script src="../main/libs/leaflet-side-by-side.js"></script>
+    <link rel="icon" href="https://simbad.quasarsr.com/wp-content/uploads/2023/10/cropped-favicon-32x32.png"/>
+    <script src="../main/libs/leaflet.browser.print.min.js"></script>
+    <script src="../main/libs/L.Control.MousePosition.js"></script>
+    <link rel="stylesheet" href="../main/libs/L.Control.MousePosition.css"/>
+    <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
+    <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
+  </head>
+
+  <body>
+    <div id="app">
+
+    <a href="../main/index.html">
+      <img src="../main/main_images/logo-simbad.jpg" class="simbad_logo" alt="SIMBAD LOGO" />
+    </a>
+
+    <script>
+        // Reads the layers.json file and creates a map
+        fetch('../wildfire_monitoring/util/fire_mon_layers.json')
+          .then(response => response.json())
+          .then(data => {
+            const map = L.map("app",{fullscreenControl: true}).setView([39.19, 2.52], 3);
+
+            // Array to hold all base layers
+            const baseLayers = {
+              "Dark Mode": L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+                format: "text/html",
+                subdomains: "abcd",
+                maxZoom: 19,
+                noWrap: true,
+                zIndex: 1
+              }),
+              "Light Mode": L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+                format: "text/html",
+                subdomains: "abcd",
+                maxZoom: 19,
+                noWrap: true,
+                zIndex: 1
+              }),
+              "Satellite": L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
+                format: "text/html",
+                subdomains: "abcd",
+                maxZoom: 19,
+                noWrap: true,
+                zIndex: 1
+              })
+            };
+
+            // The default base layer is the dark mode
+            baseLayers["Dark Mode"].addTo(map);
+
+            // Creates the mini map with the light mode base layer
+            const miniMapLayer = L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+              format: "text/html",
+              subdomains: "abcd",
+              maxZoom: 19,
+              noWrap: true,
+              zIndex: 1,
+            });
+
+            // Adds the mini map to the main map at the bottom left corner
+            const miniMap = new L.Control.MiniMap(miniMapLayer, {
+              toggleDisplay: true,
+              minimized: false,
+              position: "bottomleft",
+              width: 140,
+              height: 140,
+            }).addTo(map);
+
+            // Button that changes the base layer
+            const BaseChanger = L.Control.extend({
+              onAdd: function(map) {
+                  const button = L.DomUtil.create('button', 'leaflet-control-download');
+                  button.innerHTML = 'Change base layer';
+                  button.addEventListener('click', function() {
+                    
+                  const currentBaseLayer = Object.keys(baseLayers).find(key => map.hasLayer(baseLayers[key]));
+                  const baseLayerKeys = Object.keys(baseLayers);
+                  const currentIndex = baseLayerKeys.indexOf(currentBaseLayer);
+                  const nextIndex = (currentIndex + 1) % baseLayerKeys.length;
+                  const nextBaseLayer = baseLayerKeys[nextIndex];
+                  map.removeLayer(baseLayers[currentBaseLayer]);
+                  map.addLayer(baseLayers[nextBaseLayer]);
+
+                  });
+                  return button;
+              }
+            });
+    
+            // Adds a button to change the base layer to the bottom left corner of the map
+            const baseChangeButton = new BaseChanger({ position: 'bottomright' });
+            baseChangeButton.addTo(map);
+
+            // Button to center the map
+            const CenterMap = L.Control.extend({
+              onAdd: function(map){
+                const button = L.DomUtil.create('button', 'leaflet-control-download');
+                button.innerHTML = 'Center map';
+                button.addEventListener('click', function() {
+                  map.setView([39.19, 2.52], 3);
+                });
+                return button;
+              }
+            });
+
+            // Adds a button to center the map to the bottom right corner of the map
+            const centerMapButton = new CenterMap({ position: 'bottomright' });
+            centerMapButton.addTo(map);
+
+            // Add a print control to the map
+            L.control.browserPrint().addTo(map);
+
+            // Add a scale control to the map
+            L.control.scale({ position: 'bottomleft' }).addTo(map);
+
+            // Add a mouse position control to the map
+            L.control.mousePosition({ position: 'bottomright' }).addTo(map);
+
+            // Disables click propagation on the buttons 
+            const buttons = document.querySelectorAll('button, input');
+            buttons.forEach(button => {
+              L.DomEvent.disableClickPropagation(button);
+            });
+
+            const drawnItems = new L.FeatureGroup();
+            map.addLayer(drawnItems);
+
+            // Add Leaflet Draw control to the map
+            const drawControl = new L.Control.Draw({
+              edit: {
+                featureGroup: drawnItems,
+                remove: true
+              },
+              draw: {
+                polyline: {
+                  metric: true,
+                  shapeOptions: {
+                    color: 'blue'
+                  },
+                  allowIntersection: false,
+                  repeatMode: false
+                },
+                polygon: {
+                  allowIntersection: false,
+                  showArea: true,
+                  metric: true,
+                  shapeOptions: {
+                    color: 'green'
+                  }
+                },
+                rectangle: {
+                  showArea: true,
+                  metric: true,
+                  shapeOptions: {
+                    color: 'orange'
+                  }
+                },
+                circle: {
+                  showRadius: true,
+                  metric: true,
+                  shapeOptions: {
+                    color: 'red'
+                  }
+                },
+                marker: true,
+                circlemarker: true
+              }
+            });
+            map.addControl(drawControl);
+
+            // Handle the creation of new layers
+            map.on(L.Draw.Event.CREATED, (e) => {
+              const layer = e.layer;
+              let label = '';
+              let labelPos = null;
+
+              if (e.layerType === 'polygon' || e.layerType === 'rectangle') {
+
+                const area = L.GeometryUtil.geodesicArea(layer.getLatLngs()[0]) / 1e6;
+                label = `Area: ${area.toFixed(2)} km²`;
+                labelPos = layer.getBounds().getCenter();
+
+              } else if (e.layerType === 'polyline') {
+
+                const latlngs = layer.getLatLngs();
+                let totalDistance = 0;
+
+                for (let i = 0; i < latlngs.length - 1; i++) {
+                  totalDistance += map.distance(latlngs[i], latlngs[i + 1]);
+                }
+
+                const totalDistanceInKm = (totalDistance / 1000).toFixed(2);
+                label = `${totalDistanceInKm} km`;
+
+                labelPos = layer.getBounds().getCenter();
+              } else if (e.layerType === 'circle') {
+
+                const radius = layer.getRadius();
+                label = `Radius: ${(radius / 1000).toFixed(2)} km`;
+                labelPos = layer.getLatLng();
+
+              } else if (e.layerType === 'marker' || e.layerType === 'circlemarker') {
+
+                labelPos = layer.getLatLng();
+              }
+
+              layer.addTo(map);
+              drawnItems.addLayer(layer);
+
+              // Add the label to the layer
+              if (label && labelPos) {
+                layer.bindTooltip(label, {
+                  permanent: true,
+                  direction: 'center',
+                  className: 'distance-label-content',
+                  offset: [0, 0]
+                }).openTooltip(labelPos);
+              }
+              
+            });
+
+            // Handle the editing or removal of layers
+            map.on(L.Draw.Event.EDITED, (e) => {
+              const layers = e.layers;
+
+              layers.eachLayer((layer) => {
+                let label = '';
+                let labelPos = null;
+
+                if (layer instanceof L.Polygon || layer instanceof L.Rectangle) {
+
+                  const area = L.GeometryUtil.geodesicArea(layer.getLatLngs()[0]) / 1e6;
+                  label = `Area: ${area.toFixed(2)} km²`;
+                  labelPos = layer.getBounds().getCenter();
+
+                } else if (layer instanceof L.Polyline) {
+
+                  const latlngs = layer.getLatLngs();
+                  let totalDistance = 0;
+
+                  for (let i = 0; i < latlngs.length - 1; i++) {
+                    totalDistance += map.distance(latlngs[i], latlngs[i + 1]);
+                  }
+
+                  const totalDistanceInKm = (totalDistance / 1000).toFixed(2);
+                  label = `${totalDistanceInKm} km`;
+
+                  labelPos = layer.getBounds().getCenter();
+
+                } else if (layer instanceof L.Circle) {
+                  const radius = layer.getRadius();
+                  label = `Radius: ${(radius / 1000).toFixed(2)} km`;
+                  labelPos = layer.getLatLng();
+
+                }
+
+                // Remove the previous label if it exists and add a new one
+                if (label && labelPos) {
+                  layer.unbindTooltip();
+                  layer.bindTooltip(label, {
+                    permanent: true,
+                    direction: 'center',
+                    className: 'distance-label-content',
+                    offset: [0, 0],
+                  }).openTooltip(labelPos);
+                }
+              });
+            });
+
+            // Array to hold all layers
+            const allLayers = {};
+
+            // Function to add a layer with a watermark
+            function addLayerWithWatermark(layerUrl, layerOptions, bbox) {
+              const layer = L.tileLayer.wms(layerUrl, {
+                ...layerOptions,
+                zIndex: 11
+              });
+              const watermark = L.imageOverlay(
+                '../main/main_images/simbad_watermark.png',
+
+                [
+                  [bbox[1], bbox[0]],
+                  [bbox[3], bbox[2]]
+                ],
+                { opacity: 0.15, zIndex: 11 }
+              );
+              const group = L.layerGroup([layer, watermark]);
+              return group;
+            }
+
+            // Adds the layers in the allLayers array 
+            Object.keys(data).forEach(country => {
+              Object.keys(data[country]).forEach(region => {
+                Object.keys(data[country][region]).forEach(city => {
+                  const layers = data[country][region][city];
+                    layers.forEach(layer => {
+                      const bbox = layer.url.match(/bbox=([^&]+)/)[1].split(',').map(Number);
+                      const layerGroup = addLayerWithWatermark("https://pcfs.quasarsr.com/geoserver/wms?", {
+                        layers: layer.layer,
+                        format: "image/png",
+                        transparent: "true",
+                        version: "1.3.0",
+                        maxZoom: 19,
+                      }, bbox);
+
+                      if (!allLayers[country]) {
+                        allLayers[country] = {};
+                      }
+                      if (!allLayers[country][region]) {
+                        allLayers[country][region] = {};
+                      }
+                      if (!allLayers[country][region][city]) {
+                        allLayers[country][region][city] = {};
+                      }
+                      allLayers[country][region][city][layer.layer] = layerGroup;
+                    });
+                });
+              });
+            });
+
+            // Create the menu based on the JSON
+            const menu = L.DomUtil.create('div', 'menu');
+            menu.innerHTML = `
+              ${Object.keys(data).map(country => `
+                <button class="country">${country}</button>
+                <div class="regions" id="${country}-regions" style="display: none;">
+                  ${Object.keys(data[country]).map(region => `
+                    <button class="region">${region}</button>
+                    <div class="categories" id="${region}-categories" style="display: none;">
+                      ${Object.keys(data[country][region]).map(city => `
+                        <button class="city">${city}</button>
+                        <div class="layers" id="${region}-${city}-layers" style="display: none;">
+                          ${data[country][region][city].map(layer => `
+                            <div>
+                              <input type="checkbox" id="${region}-${city}-${layer.layer}" data-country="${country}" data-region="${region}" data-city="${city}" data-layer="${layer.layer}">
+                              <label for="${region}-${city}-${layer.layer}">${layer.layer.split(':')[1]}</label>
+                            </div>
+                          `).join('')}
+                        </div>
+                      `).join('')}
+                    </div>
+                  `).join('')}
+                </div>
+              `).join('')}
+            `;  
+
+            // Append the menu to the app div and disable click propagation to avoid map interaction
+            const app = document.getElementById('app');
+            app.appendChild(menu);
+            L.DomEvent.disableClickPropagation(document.querySelector('.menu'));
+
+
+            // Gets all the checkboxes that end with -cycle and makes them show the layers in order when checked
+            document.querySelectorAll('input[id$="-cycle"]').forEach(checkbox => {
+              checkbox.addEventListener('change', showAllLayersInOrder);
+            });
+
+            // Toggle layers on checkbox change
+            function toggleLayer(event) {
+              const country = event.target.getAttribute('data-country');
+              const region = event.target.getAttribute('data-region');
+              const city = event.target.getAttribute('data-city');
+              const layerName = event.target.getAttribute('data-layer');
+              const layerGroup = allLayers[country][region][city][layerName];
+
+              // Add or remove the layer from the map
+              if (event.target.checked) {
+                map.addLayer(layerGroup);
+
+                const matchingLayer = data[country][region][city].find(layer => layer.layer === layerName);
+                const bbox = matchingLayer.url.match(/bbox=([^&]+)/)[1].split(',').map(Number);
+                const bounds = [
+                  [bbox[1], bbox[0]],
+                  [bbox[3], bbox[2]]
+                ];
+                map.fitBounds(bounds, { maxZoom: 12 });
+              } else {
+                map.removeLayer(layerGroup);
+              }
+            }
+
+            // For each checkbox, add an event listener to toggle the layer
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+              checkbox.addEventListener('change', toggleLayer);
+            });
+            
+            // Show/hide regions when clicking on a country
+            document.querySelectorAll(".country").forEach(countryButton => {
+              countryButton.addEventListener("click", event => {
+                const regionsDiv = event.target.nextElementSibling;
+                if (regionsDiv.style.display === "block") {
+                  regionsDiv.style.display = "none";
+                } else {
+                  regionsDiv.style.display = "block";
+                }
+              });
+            });
+
+            // Show/hide categories when clicking on a region
+            document.querySelectorAll(".region").forEach(regionButton => {
+              regionButton.addEventListener("click", event => {
+                const categoriesDiv = event.target.nextElementSibling;
+                if (categoriesDiv.style.display === "block") {
+                  categoriesDiv.style.display = "none";
+              } else {
+                  categoriesDiv.style.display = "block";
+              }
+              });
+            });
+    
+            // Show/hide layers when clicking on a city
+            document.querySelectorAll(".city").forEach(cityButton => {
+              cityButton.addEventListener("click", event => {
+                const layersDiv = event.target.nextElementSibling;
+                if (layersDiv.style.display === "block") {
+                  layersDiv.style.display = "none";
+                } else {
+                      layersDiv.style.display = "block";
+                }
+              });
+            });
+    
+            // Create a button to download the selected layers
+            const DownloadButton = L.Control.extend({
+              onAdd: function(map) {
+                const button = L.DomUtil.create('button', 'leaflet-control-download');
+                button.innerHTML = 'Download selected maps';
+                L.DomEvent.disableClickPropagation(button);
+                button.style.visibility = 'hidden';
+
+                button.addEventListener('click', function() {
+                  const selectedLayers = [];
+
+                  // Iterate over all countries, regions, and categories to find active layers
+                  Object.keys(allLayers).forEach(country => {
+                    Object.keys(allLayers[country]).forEach(region => {
+                      Object.keys(allLayers[country][region]).forEach(city => {
+                        Object.keys(allLayers[country][region][city]).forEach(layerName => {
+                          const layerGroup = allLayers[country][region][city][layerName];
+                          if (map.hasLayer(layerGroup)) {
+                            selectedLayers.push({ country, region, city, layerName });
+                          }
+                        });
+                      });
+                    });
+                  });
+
+                  // Open a new tab for each selected layer
+                  selectedLayers.forEach(({ country, region, city, layerName }) => {
+                    const matchingLayer = data[country][region][city].find(layer => layer.layer === layerName);
+                    if (matchingLayer) {
+                      window.open(matchingLayer.url, "_blank");
+                    }
+                  });
+                });
+
+                return button;
+              }
+            });
+
+            // Add the download button to the map at the bottom right corner
+            const downloadButton = new DownloadButton({ position: 'bottomright' });
+            downloadButton.addTo(map);
+
+            // Function to update the visibility of the download button
+            function updateDownloadButtonVisibility() {
+              const selectedLayers = [];
+              
+              // Iterate over all countries, regions, and categories to find active layers
+              Object.keys(allLayers).forEach(country => {
+                Object.keys(allLayers[country]).forEach(region => {
+                  Object.keys(allLayers[country][region]).forEach(city => {
+                    Object.keys(allLayers[country][region][city]).forEach(layerName => {
+                      const layerGroup = allLayers[country][region][city][layerName];
+                      if (map.hasLayer(layerGroup)) {
+                        selectedLayers.push(layerName);
+                      }
+                    });
+                  });
+                });
+              });
+
+              // Show or hide the button based on the number of selected layers
+              const button = document.querySelector('.leaflet-control-download');
+              if (selectedLayers.length > 0) {
+                button.style.visibility = 'visible';
+              } else {
+                button.style.visibility = 'hidden';
+              }
+            }
+
+            // Attach the update function to layer toggle events
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+              checkbox.addEventListener('change', updateDownloadButtonVisibility);
+            });
+    
+          })
+      </script>
+    </div>
+  </body>
+</html>
