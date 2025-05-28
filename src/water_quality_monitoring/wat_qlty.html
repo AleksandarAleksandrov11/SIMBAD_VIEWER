@@ -20,6 +20,8 @@
     <link rel="stylesheet" href="../main/libs/L.Control.MousePosition.css"/>
     <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
     <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol/dist/L.Control.Locate.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol/dist/L.Control.Locate.min.js" charset="utf-8"></script>
   </head>
 
   <body>
@@ -130,6 +132,19 @@
 
             // Add a mouse position control to the map
             L.control.mousePosition({ position: 'bottomright' }).addTo(map);
+                        
+            // Add a locate control to the map
+            L.control.locate({
+              position: 'topleft',
+              drawCircle: true,
+              follow: true,
+              setView: true,
+              flyTo: true,
+              locateOptions: {
+                maxZoom: 16,
+                watch: true
+              }
+            }).addTo(map);
 
             // Disables click propagation on the buttons 
             const buttons = document.querySelectorAll('button, input');
@@ -307,8 +322,7 @@
             // Adds the layers in the allLayers array 
             Object.keys(data).forEach(country => {
               Object.keys(data[country]).forEach(region => {
-                Object.keys(data[country][region]).forEach(category => {
-                  const layers = data[country][region][category];
+                  const layers = data[country][region];
                     layers.forEach(layer => {
                       const bbox = layer.url.match(/bbox=([^&]+)/)[1].split(',').map(Number);
                       const layerGroup = addLayerWithWatermark("https://pcfs.quasarsr.com/geoserver/wms?", {
@@ -325,12 +339,8 @@
                       if (!allLayers[country][region]) {
                         allLayers[country][region] = {};
                       }
-                      if (!allLayers[country][region][category]) {
-                        allLayers[country][region][category] = {};
-                      }
-                      allLayers[country][region][category][layer.layer] = layerGroup;
+                      allLayers[country][region][layer.layer] = layerGroup;
                     });
-                });
               });
             });
 
@@ -342,19 +352,14 @@
                 <div class="regions" id="${country}-regions" style="display: none;">
                   ${Object.keys(data[country]).map(region => `
                     <button class="region">${region}</button>
-                    <div class="categories" id="${region}-categories" style="display: none;">
-                      ${Object.keys(data[country][region]).map(category => `
-                        <button class="category">${category}</button>
-                        <div class="layers" id="${region}-${category}-layers" style="display: none;">
-                          ${data[country][region][category].map(layer => `
+                        <div class="layers" id="${region}-layers" style="display: none;">
+                          ${data[country][region].map(layer => `
                             <div>
-                              <input type="checkbox" id="${region}-${category}-${layer.layer}" data-country="${country}" data-region="${region}" data-category="${category}" data-layer="${layer.layer}">
-                              <label for="${region}-${category}-${layer.layer}">${layer.layer.split(':')[1].split('_')[1]} ${layer.layer.split(':')[1].split('_')[2]} ${layer.layer.split(':')[1].split('_')[8]}</label>
+                              <input type="checkbox" id="${region}-${layer.layer}" data-country="${country}" data-region="${region}" " data-layer="${layer.layer}">
+                              <label for="${region}-${layer.layer}">${layer.layer.split(':')[1].split('_')[1]} ${layer.layer.split(':')[1].split('_')[2]} ${layer.layer.split(':')[1].split('_')[8]}</label>
                             </div>
                           `).join('')}
                         </div>
-                      `).join('')}
-                    </div>
                   `).join('')}
                 </div>
               `).join('')}
@@ -375,15 +380,14 @@
             function toggleLayer(event) {
               const country = event.target.getAttribute('data-country');
               const region = event.target.getAttribute('data-region');
-              const category = event.target.getAttribute('data-category');
               const layerName = event.target.getAttribute('data-layer');
-              const layerGroup = allLayers[country][region][category][layerName];
+              const layerGroup = allLayers[country][region][layerName];
 
               // Add or remove the layer from the map
               if (event.target.checked) {
                 map.addLayer(layerGroup);
 
-                const matchingLayer = data[country][region][category].find(layer => layer.layer === layerName);
+                const matchingLayer = data[country][region].find(layer => layer.layer === layerName);
                 const bbox = matchingLayer.url.match(/bbox=([^&]+)/)[1].split(',').map(Number);
                 const bounds = [
                   [bbox[1], bbox[0]],
@@ -424,18 +428,21 @@
               });
             });
     
-            // Show/hide layers when clicking on a category
-            document.querySelectorAll(".category").forEach(categoryButton => {
-              categoryButton.addEventListener("click", event => {
-                const layersDiv = event.target.nextElementSibling;
-                if (layersDiv.style.display === "block") {
-                  layersDiv.style.display = "none";
-                } else {
-                      layersDiv.style.display = "block";
-                }
+            // Disables scroll wheel zoom when hovering the menu
+            document.querySelector('.menu').addEventListener('wheel', function (e) {
+              e.stopPropagation();
+            }, { passive: false });
+
+            // Disables scroll wheel zoom when hovering over all the buttons
+            document.querySelectorAll('button').forEach(button => {
+              button.addEventListener('mouseenter', () => {
+                map.scrollWheelZoom.disable();
+              });
+              button.addEventListener('mouseleave', () => {
+                map.scrollWheelZoom.enable();
               });
             });
-    
+
             // Create a button to download the selected layers
             const DownloadButton = L.Control.extend({
               onAdd: function(map) {
@@ -450,20 +457,18 @@
                   // Iterate over all countries, regions, and categories to find active layers
                   Object.keys(allLayers).forEach(country => {
                     Object.keys(allLayers[country]).forEach(region => {
-                      Object.keys(allLayers[country][region]).forEach(category => {
-                        Object.keys(allLayers[country][region][category]).forEach(layerName => {
-                          const layerGroup = allLayers[country][region][category][layerName];
+                        Object.keys(allLayers[country][region]).forEach(layerName => {
+                          const layerGroup = allLayers[country][region][layerName];
                           if (map.hasLayer(layerGroup)) {
-                            selectedLayers.push({ country, region, category, layerName });
+                            selectedLayers.push({ country, region, layerName });
                           }
                         });
-                      });
                     });
                   });
 
                   // Open a new tab for each selected layer
-                  selectedLayers.forEach(({ country, region, category, layerName }) => {
-                    const matchingLayer = data[country][region][category].find(layer => layer.layer === layerName);
+                  selectedLayers.forEach(({ country, region, layerName }) => {
+                    const matchingLayer = data[country][region].find(layer => layer.layer === layerName);
                     if (matchingLayer) {
                       window.open(matchingLayer.url, "_blank");
                     }
@@ -485,14 +490,12 @@
               // Iterate over all countries, regions, and categories to find active layers
               Object.keys(allLayers).forEach(country => {
                 Object.keys(allLayers[country]).forEach(region => {
-                  Object.keys(allLayers[country][region]).forEach(category => {
-                    Object.keys(allLayers[country][region][category]).forEach(layerName => {
-                      const layerGroup = allLayers[country][region][category][layerName];
+                    Object.keys(allLayers[country][region]).forEach(layerName => {
+                      const layerGroup = allLayers[country][region][layerName];
                       if (map.hasLayer(layerGroup)) {
                         selectedLayers.push(layerName);
                       }
                     });
-                  });
                 });
               });
 

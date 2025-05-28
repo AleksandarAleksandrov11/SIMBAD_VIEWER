@@ -20,6 +20,8 @@
     <link rel="stylesheet" href="../main/libs/L.Control.MousePosition.css"/>
     <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
     <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol/dist/L.Control.Locate.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol/dist/L.Control.Locate.min.js" charset="utf-8"></script>
   </head>
 
   <body>
@@ -130,7 +132,20 @@
 
             // Add a mouse position control to the map
             L.control.mousePosition({ position: 'bottomright' }).addTo(map);
-
+            
+            // Add a locate control to the map
+            L.control.locate({
+              position: 'topleft',
+              drawCircle: true,
+              follow: true,
+              setView: true,
+              flyTo: true,
+              locateOptions: {
+                maxZoom: 16,
+                watch: true
+              }
+            }).addTo(map);
+            
             // Disables click propagation on the buttons 
             const buttons = document.querySelectorAll('button, input');
             buttons.forEach(button => {
@@ -540,6 +555,21 @@
               });
             });
     
+            // Disables scroll wheel zoom when hovering the menu
+            document.querySelector('.menu').addEventListener('wheel', function (e) {
+              e.stopPropagation();
+            }, { passive: false });
+
+            // Disables scroll wheel zoom when hovering over all the buttons
+            document.querySelectorAll('button').forEach(button => {
+              button.addEventListener('mouseenter', () => {
+                map.scrollWheelZoom.disable();
+              });
+              button.addEventListener('mouseleave', () => {
+                map.scrollWheelZoom.enable();
+              });
+            });
+
             // Create a button to download the selected layers
             const DownloadButton = L.Control.extend({
               onAdd: function(map) {

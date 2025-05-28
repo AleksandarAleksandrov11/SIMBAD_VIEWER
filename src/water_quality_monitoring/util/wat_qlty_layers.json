@@ -1,7 +1,6 @@
 {
   "Portugal": {
-    "Lisbon": {
-        "Water Quality Maps": [ 
+    "Lisbon": [
             {
               "layer": "sim:S2B_MSI_2024_01_24_11_30_31_T29SMD_with_alpha",
               "url": "https://pcfs.quasarsr.com/geoserver/sim/wms?service=WMS&version=1.1.0&request=GetMap&layers=sim:S2B_MSI_2024_01_24_11_30_31_T29SMD_with_alpha&bbox=-10.16756534576416,38.7552375793457,-8.886133193969727,39.750221252441406&width=768&height=596&srs=EPSG:4326&format=image/geotiff"
@@ -10,35 +9,27 @@
               "layer": "sim:S2B_MSI_2024_12_29_11_30_48_T29SMC_with_alpha",
               "url": "https://pcfs.quasarsr.com/geoserver/sim/wms?service=WMS&version=1.1.0&request=GetMap&layers=sim:S2B_MSI_2024_12_29_11_30_48_T29SMC_with_alpha&bbox=-10.152692794799805,37.85399627685547,-8.88758373260498,38.84895324707031&width=768&height=604&srs=EPSG:4326&format=image/geotiff"
             }
-          ]
-    },
-    "Setubal": {
-        "Water Quality Maps": [
+  ],
+    "Setubal": [
             {
               "layer": "sim:S2B_MSI_2024_12_29_11_30_45_T29SNC_with_alpha",
               "url": "https://pcfs.quasarsr.com/geoserver/sim/wms?service=WMS&version=1.1.0&request=GetMap&layers=sim:S2B_MSI_2024_12_29_11_30_45_T29SNC_with_alpha&bbox=-9.00017261505127,37.852874755859375,-7.735098361968994,38.84895324707031&width=768&height=604&srs=EPSG:4326&format=image/geotiff"
             }
-          ]
-    }
+          
+  ]
   },
   "Spain": {
-    "Cadiz": {
-        "Water Quality Maps": [
+    "Cadiz": [
             {
               "layer": "sim:S2B_MSI_2024_03_11_11_21_06_T29SQA_with_alpha",
               "url": "https://pcfs.quasarsr.com/geoserver/sim/wms?service=WMS&version=1.1.0&request=GetMap&layers=sim:S2B_MSI_2024_03_11_11_21_06_T29SQA_with_alpha&bbox=-6.78046989440918,36.00749588012695,-5.519472599029541,37.025238037109375&width=768&height=619&srs=EPSG:4326&format=image/geotiff"
             }
-          ]
-          
-    },
-    "Huelva": {
-        "Water Quality Maps": [
+  ],
+    "Huelva": [
             {
               "layer": "sim:S2B_MSI_2024_03_11_11_20_54_T29SPB_with_alpha",
               "url": "https://pcfs.quasarsr.com/geoserver/sim/wms?service=WMS&version=1.1.0&request=GetMap&layers=sim:S2B_MSI_2024_03_11_11_20_54_T29SPB_with_alpha&bbox=-7.876762866973877,36.93455505371094,-6.613116264343262,37.942039489746094&width=768&height=612&srs=EPSG:4326&format=image/geotiff"
-            }
-          ]
-          
-    }
+            }         
+   ]
   }
 }
