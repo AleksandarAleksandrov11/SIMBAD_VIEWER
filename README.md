@@ -158,5 +158,6 @@ Else:
 > - Project developed by Quasar Science Resources.
 > - Uses [Leaflet.js](https://leafletjs.com/) and open-source plugins.
 > - Logos and images © Quasar Science Resources and partners.
+> - Developed by **Aleksandar Aleksandrov**, Software Developer ([LinkedIn](https://www.linkedin.com/in/aleksandar-aleksandrov-stefanov-974447305/)).
 
 
