@@ -80,7 +80,7 @@ $ git clone https://github.com/AleksandarAleksandrov11/SIMBAD_VIEWER.git
 If you have Node.js and npm installed:
 
 1. Open a terminal in the project folder.
-2. 2. Install `http-server` globally (only once):
+2. Install `http-server` globally (only once):
    
 ```bash
 npm install -g http-server
