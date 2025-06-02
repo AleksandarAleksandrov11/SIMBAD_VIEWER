@@ -1,4 +1,4 @@
-# SIMBAD_VIEWER
+# SIMBAD VIEWER
 SIMBAD VIEWER is a web platform for visualizing and analyzing geospatial data related to marine, agricultural, wildfire, and water quality monitoring. It provides interactive maps, layer management, and advanced tools for researchers and professionals.
 
 ![image](https://github.com/user-attachments/assets/69b4f18d-352d-4915-ae51-b7d355096fe7)
@@ -6,7 +6,7 @@ SIMBAD VIEWER is a web platform for visualizing and analyzing geospatial data re
 ![image](https://github.com/user-attachments/assets/94445236-16b5-4e14-ad1e-9ba8a5a09249)
 
 
-# Project structure
+# Project Structure
 
 ```text
 SIMBAD_VIEWER/
@@ -53,7 +53,7 @@ SIMBAD_VIEWER/
 │   │   ├── css/
 │   │   │   └── pre_agr.css           # Precision Agriculture specific styles
 │   │   ├── util/
-│   │       └── pre_agr_layers.json   # Precision Agriculture layers config
+│           └── pre_agr_layers.json   # Precision Agriculture layers config
 │
 ├── README.md                         # Project documentation
 ├── .gitignore                        # Git ignore file
@@ -155,7 +155,7 @@ Else:
 ```
 
 # License & Credits
-> - Project developed by Quasar Science Resources.
+> - Project developed for [Quasar Science Resources](https://quasarsr.com/).
 > - Uses [Leaflet.js](https://leafletjs.com/) and open-source plugins.
 > - Logos and images © Quasar Science Resources and partners.
 > - Developed by **Aleksandar Aleksandrov**, Software Developer ([LinkedIn](https://www.linkedin.com/in/aleksandar-aleksandrov-stefanov-974447305/)).
