@@ -88,7 +88,7 @@ npm install -g http-server
 Start the server from the src/main folder:
 
 ```bash
-cd src/main
+cd SIMBAD_VIEWER\src
 
 http-server
 ```
@@ -100,7 +100,7 @@ If you have Python installed:
 Start a simple HTTP server:
 
 ```bash
-cd src/main
+cd SIMBAD_VIEWER\src
 
 python -m http.server
 ```
