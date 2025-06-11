@@ -71,7 +71,7 @@ html, body, #app {
 .menu .region:hover {
     background-color: #c4c4c1;
 }
-.categories {
+.cities {
     padding: 10px;
     display: none;
     overflow: hidden;

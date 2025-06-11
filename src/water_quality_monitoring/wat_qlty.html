@@ -32,10 +32,58 @@
     </a>
 
     <script>
-        // Reads the layers.json file and creates a map
-        fetch('../water_quality_monitoring/util/wat_qlty_layers.json')
-          .then(response => response.json())
-          .then(data => {
+
+        // Reads the WMS GetCapabilities from the Geoserver and parses it to get the layers
+        fetch('https://pcfs.quasarsr.com/geoserver/WaterQualityMonitoring/wms?service=WMS&request=GetCapabilities')
+            .then(res => res.text())
+            .then(str => (new window.DOMParser()).parseFromString(str, "text/xml"))
+            .then(xml => {
+
+            // Gets all the layers from the XML
+            const layersFromXML = Array.from(xml.querySelectorAll('Layer Layer'));
+
+            // Groups the layers by country and region
+            const groupedLayers = {};
+
+            // Iterate over each layer and extract the name, country, region, and bounding box
+            layersFromXML.forEach(layer => {
+                const nameElem = layer.querySelector('Name');
+                const name = nameElem.textContent;
+
+                const country = name.split('_')[0];
+                const region = name.split('_')[1];
+
+                const bboxElem = layer.querySelector('BoundingBox[CRS="CRS:84"]');
+                let bbox = null;
+                if (bboxElem) {
+                    bbox = [
+                    bboxElem.getAttribute('minx'),
+                    bboxElem.getAttribute('miny'),
+                    bboxElem.getAttribute('maxx'),
+                    bboxElem.getAttribute('maxy')
+                    ].join(',');
+                }
+
+                const wmsUrl = `https://pcfs.quasarsr.com/geoserver/WaterQualityMonitoring/wms?service=WMS&version=1.3.0&request=GetMap&layers=${name}&bbox=${bbox}&width=768&height=673&srs=CRS:84&format=image/geotiff`;
+
+
+                // Initialize the objects if they don't exist
+                if (!groupedLayers[country]) {
+                    groupedLayers[country] = {};
+                }
+                if (!groupedLayers[country][region]) {
+                    groupedLayers[country][region] = [];
+                }
+
+                // Push the layer information into the appropriate array
+                groupedLayers[country][region].push({
+                    layer: name,
+                    bbox: bbox,
+                    url: wmsUrl
+                });
+
+            });
+
             const map = L.map("app",{fullscreenControl: true}).setView([39.19, 2.52], 3);
 
             // Array to hold all base layers
@@ -297,9 +345,6 @@
               });
             });
 
-            // Array to hold all layers
-            const allLayers = {};
-
             // Function to add a layer with a watermark
             function addLayerWithWatermark(layerUrl, layerOptions, bbox) {
               const layer = L.tileLayer.wms(layerUrl, {
@@ -319,51 +364,26 @@
               return group;
             }
 
-            // Adds the layers in the allLayers array 
-            Object.keys(data).forEach(country => {
-              Object.keys(data[country]).forEach(region => {
-                  const layers = data[country][region];
-                    layers.forEach(layer => {
-                      const bbox = layer.url.match(/bbox=([^&]+)/)[1].split(',').map(Number);
-                      const layerGroup = addLayerWithWatermark("https://pcfs.quasarsr.com/geoserver/wms?", {
-                        layers: layer.layer,
-                        format: "image/png",
-                        transparent: "true",
-                        version: "1.3.0",
-                        maxZoom: 19,
-                      }, bbox);
-
-                      if (!allLayers[country]) {
-                        allLayers[country] = {};
-                      }
-                      if (!allLayers[country][region]) {
-                        allLayers[country][region] = {};
-                      }
-                      allLayers[country][region][layer.layer] = layerGroup;
-                    });
-              });
-            });
-
-            // Create the menu based on the JSON
+            // Create the menu
             const menu = L.DomUtil.create('div', 'menu');
             menu.innerHTML = `
-              ${Object.keys(data).map(country => `
+            ${Object.keys(groupedLayers).map(country => `
                 <button class="country">${country}</button>
                 <div class="regions" id="${country}-regions" style="display: none;">
-                  ${Object.keys(data[country]).map(region => `
+                ${Object.keys(groupedLayers[country]).map(region => `
                     <button class="region">${region}</button>
-                        <div class="layers" id="${region}-layers" style="display: none;">
-                          ${data[country][region].map(layer => `
-                            <div>
-                              <input type="checkbox" id="${region}-${layer.layer}" data-country="${country}" data-region="${region}" " data-layer="${layer.layer}">
-                              <label for="${region}-${layer.layer}">${layer.layer.split(':')[1].split('_')[1]} ${layer.layer.split(':')[1].split('_')[2]} ${layer.layer.split(':')[1].split('_')[8]}</label>
-                            </div>
-                          `).join('')}
-                        </div>
-                  `).join('')}
+                    <div class="layers" id="${region}-layers" style="display: none;">
+                      ${groupedLayers[country][region].map(layer => `
+                          <div>
+                          <input type="checkbox" id="${region}-${layer.layer}" data-country="${country}" data-region="${region}" data-layer="${layer.layer}">
+                          <label for="${region}-${layer.layer}">${layer.layer.split('_')[2]}</label>
+                          </div>
+                      `).join('')}
+                    </div>
+                `).join('')}
                 </div>
-              `).join('')}
-            `;  
+            `).join('')}
+            `;
 
             // Append the menu to the app div and disable click propagation to avoid map interaction
             const app = document.getElementById('app');
@@ -378,25 +398,38 @@
 
             // Toggle layers on checkbox change
             function toggleLayer(event) {
-              const country = event.target.getAttribute('data-country');
-              const region = event.target.getAttribute('data-region');
-              const layerName = event.target.getAttribute('data-layer');
-              const layerGroup = allLayers[country][region][layerName];
+            const country = event.target.getAttribute('data-country');
+            const region = event.target.getAttribute('data-region');
+            const layerName = event.target.getAttribute('data-layer');
+            const matchingLayer = groupedLayers[country][region].find(layer => layer.layer === layerName);
+            if (event.target.checked) {
 
-              // Add or remove the layer from the map
-              if (event.target.checked) {
-                map.addLayer(layerGroup);
+                const group = addLayerWithWatermark(
+                "https://pcfs.quasarsr.com/geoserver/WaterQualityMonitoring/wms",
+                {
+                    layers: layerName,
+                    format: 'image/png',
+                    transparent: true,
+                    version: '1.3.0',
+                    crs: L.CRS.EPSG4326
+                },
+                matchingLayer.bbox.split(',').map(Number)
+                );
+                group.addTo(map);
 
-                const matchingLayer = data[country][region].find(layer => layer.layer === layerName);
-                const bbox = matchingLayer.url.match(/bbox=([^&]+)/)[1].split(',').map(Number);
+                event.target._layerGroup = group;
+
                 const bounds = [
-                  [bbox[1], bbox[0]],
-                  [bbox[3], bbox[2]]
+                [matchingLayer.bbox.split(',')[1], matchingLayer.bbox.split(',')[0]],
+                [matchingLayer.bbox.split(',')[3], matchingLayer.bbox.split(',')[2]]
                 ];
                 map.fitBounds(bounds, { maxZoom: 12 });
-              } else {
-                map.removeLayer(layerGroup);
-              }
+            } else {
+                if (event.target._layerGroup) {
+                map.removeLayer(event.target._layerGroup);
+                event.target._layerGroup = null;
+                }
+            }
             }
 
             // For each checkbox, add an event listener to toggle the layer
@@ -416,7 +449,7 @@
               });
             });
 
-            // Show/hide categories when clicking on a region
+            // Show/hide cities when clicking on a region
             document.querySelectorAll(".region").forEach(regionButton => {
               regionButton.addEventListener("click", event => {
                 const categoriesDiv = event.target.nextElementSibling;
@@ -445,75 +478,48 @@
 
             // Create a button to download the selected layers
             const DownloadButton = L.Control.extend({
-              onAdd: function(map) {
+            onAdd: function(map) {
                 const button = L.DomUtil.create('button', 'leaflet-control-download');
                 button.innerHTML = 'Download selected maps';
                 L.DomEvent.disableClickPropagation(button);
                 button.style.visibility = 'hidden';
 
                 button.addEventListener('click', function() {
-                  const selectedLayers = [];
-
-                  // Iterate over all countries, regions, and categories to find active layers
-                  Object.keys(allLayers).forEach(country => {
-                    Object.keys(allLayers[country]).forEach(region => {
-                        Object.keys(allLayers[country][region]).forEach(layerName => {
-                          const layerGroup = allLayers[country][region][layerName];
-                          if (map.hasLayer(layerGroup)) {
-                            selectedLayers.push({ country, region, layerName });
-                          }
-                        });
-                    });
-                  });
-
-                  // Open a new tab for each selected layer
-                  selectedLayers.forEach(({ country, region, layerName }) => {
-                    const matchingLayer = data[country][region].find(layer => layer.layer === layerName);
-                    if (matchingLayer) {
-                      window.open(matchingLayer.url, "_blank");
+                // Encuentra todos los checkboxes activos
+                const checked = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'));
+                checked.forEach(checkbox => {
+                    const country = checkbox.getAttribute('data-country');
+                    const region = checkbox.getAttribute('data-region');
+                    const layerName = checkbox.getAttribute('data-layer');
+                    const matchingLayer = groupedLayers[country][region].find(l => l.layer === layerName);
+                    if (matchingLayer && matchingLayer.url) {
+                    window.open(matchingLayer.url, "_blank");
                     }
-                  });
+                });
                 });
 
                 return button;
-              }
+            }
             });
 
-            // Add the download button to the map at the bottom right corner
+            // Añade el botón al mapa
             const downloadButton = new DownloadButton({ position: 'bottomright' });
             downloadButton.addTo(map);
 
-            // Function to update the visibility of the download button
+            // Actualiza la visibilidad del botón según los checkboxes activos
             function updateDownloadButtonVisibility() {
-              const selectedLayers = [];
-              
-              // Iterate over all countries, regions, and categories to find active layers
-              Object.keys(allLayers).forEach(country => {
-                Object.keys(allLayers[country]).forEach(region => {
-                    Object.keys(allLayers[country][region]).forEach(layerName => {
-                      const layerGroup = allLayers[country][region][layerName];
-                      if (map.hasLayer(layerGroup)) {
-                        selectedLayers.push(layerName);
-                      }
-                    });
-                });
-              });
-
-              // Show or hide the button based on the number of selected layers
-              const button = document.querySelector('.leaflet-control-download');
-              if (selectedLayers.length > 0) {
+            const checked = document.querySelectorAll('input[type="checkbox"]:checked');
+            const button = document.querySelector('.leaflet-control-download');
+            if (checked.length > 0) {
                 button.style.visibility = 'visible';
-              } else {
+            } else {
                 button.style.visibility = 'hidden';
-              }
             }
-
-            // Attach the update function to layer toggle events
+            }
             document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-              checkbox.addEventListener('change', updateDownloadButtonVisibility);
+            checkbox.addEventListener('change', updateDownloadButtonVisibility);
             });
-    
-          })
+        })
       </script>
     </div>
   </body>
