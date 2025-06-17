@@ -382,7 +382,7 @@
                           ${groupedLayers[country][region][category].map(layer => `
                             <div>
                               <input type="checkbox" id="${region}-${category}-${layer.layer}" data-country="${country}" data-region="${region}" data-category="${category}" data-layer="${layer.layer}">
-                              <label for="${region}-${category}-${layer.layer}">${layer.layer.split('_')[3]}</label>
+                              <label for="${region}-${category}-${layer.layer}">${layer.layer.split('_')[3]} ${layer.layer.split('_')[4]} ${layer.layer.split('_')[5]}</label>
                             </div>
                           `).join('')}
                           <div>
@@ -424,7 +424,7 @@
 
                 if (currentLayerIndex < layersArr.length) {
                   const layerObj = layersArr[currentLayerIndex];
-                  label.innerHTML = `Showing ${layerObj.layer.split('_')[3] || layerObj.layer}`;
+                  label.innerHTML = `Showing ${layerObj.layer.split('_')[4] || layerObj.layer}`;
                   const group = addLayerWithWatermark(
                     "https://pcfs.quasarsr.com/geoserver/MarineEcosystemsMonitoring/wms",
                     {
