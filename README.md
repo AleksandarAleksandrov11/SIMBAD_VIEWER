@@ -23,37 +23,27 @@ SIMBAD_VIEWER/
 │   │   ├── mar_mon.html              # Maritime Monitoring viewer
 │   │   ├── css/
 │   │   │   └── mar_mon.css           # Maritime Monitoring specific styles
-│   │   ├── util/
-│   │       └── mar_mon_layers.json   # Maritime Monitoring layers config
 │   │
 │   ├── marine_ecosystems/
 │   │   ├── mar_eco.html              # Marine Ecosystems viewer
 │   │   ├── comparison_layers.html    # Marine Ecosystems comparison layers viewer
 │   │   ├── css/
 │   │   │   └── mar_eco.css           # Marine Ecosystems specific styles
-│   │   ├── util/
-│   │       └── mar_eco_layers.json   # Marine Ecosystems layers config
 │   │
 │   ├── water_quality_monitoring/
 │   │   ├── wat_qlty.html             # Water Quality Monitoring viewer
 │   │   ├── css/
 │   │   │   └── wat_qlty.css          # Water Quality specific styles
-│   │   ├── util/
-│   │       └── wat_qlty_layers.json  # Water Quality layers config
 │   │
 │   ├── wildfire_monitoring/
 │   │   ├── fire_mon.html             # Wildfire Monitoring viewer
 │   │   ├── css/
 │   │   │   └── fire_mon.css          # Wildfire Monitoring specific styles
-│   │   ├── util/
-│   │       └── fire_mon_layers.json  # Wildfire Monitoring layers config
 │   │
 │   ├── precision_agriculture/
 │   │   ├── pre_agr.html              # Precision Agriculture viewer
 │   │   ├── css/
 │   │   │   └── pre_agr.css           # Precision Agriculture specific styles
-│   │   ├── util/
-│           └── pre_agr_layers.json   # Precision Agriculture layers config
 │
 ├── README.md                         # Project documentation
 ├── .gitignore                        # Git ignore file
@@ -115,45 +105,44 @@ Go to http://localhost:8000 in your browser.
 - **Measurement Tools**: Draw and measure distances or areas on the map.
 - **Base Layer Switch**: Change between dark, light, and satellite map backgrounds.
 
-# How to Add or Modify Layers
+# Technologies and Libraries Used
 
-To add or update map layers for a specific viewer:
+### Web Mapping and Visualization
 
-1. Open the corresponding JSON configuration file, located in the `util/` folder of each product (e.g., `mar_eco_layers.json` for Marine Ecosystems).
-2. Add or edit entries using the following structure:
+- **[Leaflet.js](https://leafletjs.com/)**  
+  JavaScript library for building interactive web maps.
+- **[Leaflet Draw](https://github.com/Leaflet/Leaflet.draw)**  
+  Plugin for drawing and editing shapes like polygons, polylines, and rectangles on the map.
+- **[Leaflet MiniMap](https://github.com/Norkart/Leaflet-MiniMap)**  
+  Displays a small overview map in a corner of the main map.
+- **[Leaflet.browserPrint](https://github.com/Igor-Vladyka/leaflet.browser.print)**  
+  Enables users to print the map directly from the browser.
+- **[Leaflet.Locate](https://github.com/domoritz/leaflet-locatecontrol)**  
+  Adds a button to show the user's current location on the map.
+- **[Leaflet.MousePosition](https://github.com/ardhi/Leaflet.MousePosition)**  
+  Displays the geographic coordinates of the mouse pointer.
+- **[Leaflet.Fullscreen](https://github.com/Leaflet/Leaflet.fullscreen)**  
+  Allows toggling the map to fullscreen mode.
+- **[Leaflet.GeometryUtil](https://github.com/makinacorpus/Leaflet.GeometryUtil)**  
+  Provides tools for measuring areas and distances on the map.
+
+### Geospatial Data Services
+
+- **[GeoServer](https://geoserver.org/)**  
+  Open-source server for sharing and publishing geospatial data using open standards.
+- **WMS (Web Map Service)**  
+  Standard protocol for serving georeferenced map images over the internet.
+  - `GetCapabilities`: Retrieves metadata including available layers and styles.
+
+### Web Development Stack
+
+- **HTML5, CSS3, JavaScript**  
+  Core technologies for the UI and logic of the web application.
+- **Fetch API**  
+  Used to retrieve WMS metadata (`GetCapabilities`) and other remote resources.
+- **DOMParser API**  
+  Converts raw XML into a navigable DOM structure for further data processing.
    
-If water_quality_monitoring:
-
-```json
-{
-  "Country": {
-      "City": [
-        {
-          "layer": "your_workspace:your_layer_name",
-          "url": "https://your-geoserver-domain/geoserver/your_workspace/wms?service=WMS&version=1.1.0&request=GetMap&layers=your_workspace:your_layer_name&bbox=minX,minY,maxX,maxY&width=768&height=673&srs=EPSG:4326&format=image/png"
-        }
-      ]
-  }
-}
-```
-
-Else:
-
-```json
-{
-  "Country": {
-    "City": {
-      "Category": [
-        {
-          "layer": "your_workspace:your_layer_name",
-          "url": "https://your-geoserver-domain/geoserver/your_workspace/wms?service=WMS&version=1.1.0&request=GetMap&layers=your_workspace:your_layer_name&bbox=minX,minY,maxX,maxY&width=768&height=673&srs=EPSG:4326&format=image/png"
-        }
-      ]
-    }
-  }
-}
-```
-
 # License & Credits
 > - Project developed by [Quasar Science Resources](https://quasarsr.com/).
 > - Uses [Leaflet.js](https://leafletjs.com/) and open-source plugins.
