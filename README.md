@@ -133,6 +133,8 @@ Go to http://localhost:8000 in your browser.
 - **WMS (Web Map Service)**  
   Standard protocol for serving georeferenced map images over the internet.
   - `GetCapabilities`: Retrieves metadata including available layers and styles.
+- **BaseMaps**  
+   Used as base layers for visualization.
 
 ### Web Development Stack
 
