@@ -60,7 +60,7 @@ $ git clone https://github.com/AleksandarAleksandrov11/SIMBAD_VIEWER.git
 2. Open the file `src/main/index.html` with your web browser (e.g. double-click it).
 3. Click on any product to access its dedicated viewer.
 
-> ⚠️ Some features (like loading JSON files or using Leaflet layers) might **not work correctly** without a local server due to browser security restrictions.
+> ⚠️ Some features might **not work correctly** without a local server due to browser security restrictions.
 
 ---
 
